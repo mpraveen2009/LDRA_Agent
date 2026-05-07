@@ -8,32 +8,51 @@ Develop an **end-to-end CI/CD workflow** that automatically scans GitHub commits
 ## Team Structure: 4 People, 1 Team
 
 ### Person 1: GitHub Integration & Commit Detection
-**Responsibility**: Connect GitHub → detect changes → feed to pipeline
+**Responsibility**: Connect GitHub → trigger LDRA pipeline on local machine
 
-**Approach**: GitHub Actions (no webhook server required)
+**Approach**: Self-hosted GitHub runner on local machine → local trigger agent endpoint (no cross-repo dispatch, no external API)
 
 **Tasks**:
-- [ ] Write `.github/workflows/trigger.yml` with `on: push` trigger filtered to `**.c` and `**.h` paths
-- [ ] Write `commit_detector.py` that reads `GITHUB_EVENT_PATH` env var (Actions-injected event JSON) and extracts added/modified `.c`/`.h` files
-- [ ] Output filtered file list + commit hash for Person 2 (via step output or artifact)
-- [ ] Log detected changes in workflow output
+- [ ] Install self-hosted GitHub runner on local machine where LDRA is installed
+- [ ] Register runner with source repo (get config token from repo Settings → Actions → Runners)
+- [ ] Start runner in background as Windows service or persistent process
+- [ ] In source repo, add `.github/workflows/trigger.yml` workflow that runs on `self-hosted` runner
+- [ ] Workflow makes HTTP POST to `http://localhost:8000/trigger` with source_repo, commit_sha, branch
+- [ ] Add `/trigger` and `/status/{job_id}` endpoints to always-running LDRA server
+- [ ] `/trigger` accepts request, creates job_id, enqueues background work, returns `{accepted: true, job_id}`
+- [ ] `/status/{job_id}` returns current status (queued/running/success/failed) with summary
+- [ ] Workflow optionally polls `/status/{job_id}` to wait for completion before marking step as pass/fail
+- [ ] Log all trigger requests and job status in server logs for debugging
 
-**Key inputs** (all auto-injected by GitHub Actions — no setup needed):
-- `GITHUB_EVENT_PATH` — path to the push event JSON with `commits[].added`, `commits[].modified`
-- `GITHUB_SHA` — current commit hash
+**Key inputs**:
+- GitHub Actions workflow context:
+  - `github.repository` — source repo name/owner
+  - `github.sha` — current commit hash
+  - `github.ref_name` — branch name
 
-**Sample `commit_detector.py` entry point**:
-```python
-import json, os
-event = json.load(open(os.environ["GITHUB_EVENT_PATH"]))
-changed = [f for c in event["commits"] for f in c["added"] + c["modified"] if f.endswith((".c", ".h"))]
+**Sample trigger request**:
+```json
+POST http://localhost:8000/trigger
+{
+  "source_repo": "ananthdosskone/sampleCRepo",
+  "commit_sha": "abc123def456",
+  "branch": "main"
+}
+
+Response:
+{
+  "accepted": true,
+  "job_id": "550e8400-e29b-41d4-a716-446655440000"
+}
 ```
 
 **Deliverables**:
-- `commit_detector.py` - Event parser & file extractor
-- `.github/workflows/trigger.yml` - GitHub Actions workflow (push trigger)
+- Self-hosted GitHub runner installed and registered on local machine
+- `.github/workflows/trigger.yml` in source repo — workflow that calls local trigger endpoint
+- `/trigger` endpoint in always-running LDRA server
+- `/status/{job_id}` endpoint in always-running LDRA server
 
-**Tech Stack**: Python stdlib (json, os, pathlib), GitHub Actions YAML
+**Tech Stack**: GitHub Actions (self-hosted runner), FastAPI/Flask, Python stdlib (json, uuid, pathlib), Windows Service or background process
 
 ---
 
@@ -122,18 +141,27 @@ changed = [f for c in event["commits"] for f in c["added"] + c["modified"] if f.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     GitHub Push Event                        │
+│              Source Repo GitHub Push Event                   │
 └────────────────────────┬────────────────────────────────────┘
                          │
         ┌────────────────▼────────────────┐
-        │  Person 1: Commit Detection     │
-        │  ├─ Parse diff                  │
-        │  ├─ Identify new/modified .c    │
-        │  └─ Queue files                 │
+        │  GitHub Actions on self-hosted  │
+        │  ├─ Detect push                 │
+        │  ├─ Extract repo + commit SHA   │
+        │  └─ HTTP POST to localhost      │
+        └────────────────┬────────────────┘
+                         │
+        ┌────────────────▼────────────────┐
+        │  Person 1: Trigger Agent        │
+        │  ├─ POST /trigger endpoint      │
+        │  ├─ Create job_id               │
+        │  ├─ Enqueue background work     │
+        │  └─ Return {accepted, job_id}   │
         └────────────────┬────────────────┘
                          │
         ┌────────────────▼────────────────┐
         │  Person 2: Test Generation      │
+        │  ├─ Pull source repo commit     │
         │  ├─ Analyze C functions         │
         │  ├─ Generate TCF templates      │
         │  ├─ Populate test cases         │
@@ -170,13 +198,14 @@ changed = [f for c in event["commits"] for f in c["added"] + c["modified"] if f.
 ## File Structure
 
 ```
-LDRA_Agent/
+Source Repo (e.g., sampleCRepo):
 ├── .github/
 │   └── workflows/
-│       ├── trigger.yml               # Person 1: Main workflow trigger
-│       └── ldra-tests.yml            # Person 4: Full testing workflow
+│       └── trigger.yml               # Person 1: Workflow that calls localhost trigger
+
+LDRA_Agent (always running locally):
+├── server.py                         # Person 1-4: FastAPI server with /trigger and /status endpoints
 ├── src/
-│   ├── commit_detector.py            # Person 1: Webhook & parser
 │   ├── test_case_generator.py        # Person 2: C analyzer & TCF generator
 │   ├── test_executor.py              # Person 3: LDRA runner
 │   ├── coverage_analyzer.py          # Person 3: Coverage parser
@@ -184,8 +213,6 @@ LDRA_Agent/
 │   └── github_reporter.py            # Person 4: GitHub integration
 ├── server.py                         # LDRA MCP server (existing)
 ├── TestCases/                        # Auto-generated .tcf files
-├── results.json                      # Test results
-├── test_report.html                  # Generated report
 └── HACKATHON_PLAN.md                # This file
 ```
 
@@ -193,15 +220,32 @@ LDRA_Agent/
 
 ## Integration Points
 
+### GitHub Workflow → Person 1 Trigger Agent
+**Input**: Push event context
+```json
+POST http://localhost:8000/trigger
+{
+  "source_repo": "ananthdosskone/sampleCRepo",
+  "commit_sha": "abc123def456",
+  "branch": "main"
+}
+
+Response:
+{
+  "accepted": true,
+  "job_id": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
 ### Person 1 → Person 2
-**Output**: List of file paths to analyze
+**Enqueued job payload**:
 ```json
 {
-  "files": [
-    "/path/to/file1.c",
-    "/path/to/file2.c"
-  ],
-  "commit": "abc123def456"
+  "job_id": "550e8400-e29b-41d4-a716-446655440000",
+  "source_repo": "ananthdosskone/sampleCRepo",
+  "commit_sha": "abc123def456",
+  "branch": "main",
+  "status": "queued"
 }
 ```
 
@@ -210,8 +254,8 @@ LDRA_Agent/
 ```json
 {
   "tcf_files": [
-    "/TestCases/file1_test.tcf",
-    "/TestCases/file2_test.tcf"
+    "TestCases/file1_test.tcf",
+    "TestCases/file2_test.tcf"
   ],
   "project_tcf": "C:\\LDRA_Workarea\\project.tcf"
 }
@@ -268,7 +312,7 @@ LDRA_Agent/
 
 ## Success Criteria
 
-- ✅ Detects new/modified C files on GitHub push
+- ✅ Detects new commits from source repos
 - ✅ Auto-generates and runs LDRA tests
 - ✅ Reports coverage metrics
 - ✅ Posts results to PR comments
@@ -281,11 +325,10 @@ LDRA_Agent/
 ## Dependencies
 
 - Python 3.8+
-- GitHub Actions
-- LDRA Toolsuite (existing)
-- PyGithub
-- FastAPI/Flask (for webhook)
-- requests library
+- GitHub Actions (self-hosted runner)
+- LDRA Toolsuite (installed locally)
+- FastAPI or Flask for HTTP endpoints
+- Git (for cloning source repos in Person 2)
 
 ---
 
@@ -294,9 +337,12 @@ LDRA_Agent/
 1. Clone the repo
 2. Assign tasks to each person
 3. Create feature branches: `feature/person1-commit-detection`, etc.
-4. Use existing `server.py` (LDRA MCP server) as foundation
-5. Meet daily to sync on integration points
-6. Test on sample C files first before full pipeline
+4. In each source repo, add sender workflow `.github/workflows/notify-ldra-agent.yml` (push on any change)
+5. Create source-repo secret `LDRA_AGENT_DISPATCH_TOKEN` with rights to dispatch to LDRA_Agent
+6. In LDRA_Agent, keep receiver workflow `.github/workflows/trigger.yml` + root `commit_detector.py`
+7. Use existing `server.py` (LDRA MCP server) as foundation
+8. Meet daily to sync on integration points
+9. Test on sample C files first before full pipeline
 
 ---
 
