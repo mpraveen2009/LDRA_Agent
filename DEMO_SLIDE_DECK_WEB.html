@@ -1,0 +1,1015 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🔥 LDRA Agent Demo - The Fantastic 4 🔥</title>
+  <style>
+    :root {
+      --bg-1: #1a0a00;
+      --bg-2: #2d1200;
+      --panel: rgba(45, 18, 0, 0.82);
+      --panel-border: rgba(255, 160, 60, 0.45);
+      --text: #fff8f0;
+      --muted: #ffd6a8;
+      --accent: #ff6b2c;
+      --accent-2: #ffb347;
+      --warn: #ffe44d;
+      --danger: #ff4444;
+      --hero: #ffcc00;
+      --good: #7fff6b;
+      --flame: #ff4500;
+      --lava: #ff8c00;
+      --sun: #ffd700;
+      --ember: #ff6347;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0; height: 100%; overflow: hidden;
+      color: var(--text);
+      font-family: "Segoe UI", "Trebuchet MS", Tahoma, sans-serif;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(255, 107, 44, 0.35), transparent 40%),
+        radial-gradient(circle at 85% 15%, rgba(255, 200, 0, 0.25), transparent 35%),
+        radial-gradient(circle at 50% 90%, rgba(255, 69, 0, 0.3), transparent 45%),
+        radial-gradient(circle at 70% 60%, rgba(255, 140, 0, 0.15), transparent 35%),
+        linear-gradient(160deg, var(--bg-1), var(--bg-2));
+    }
+
+    .deck { position: relative; width: 100%; height: 100%; isolation: isolate; }
+
+    .deck::before {
+      content: ""; position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 140, 0, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 140, 0, 0.04) 1px, transparent 1px);
+      background-size: 36px 36px;
+      pointer-events: none; z-index: -1;
+    }
+
+    .slide {
+      display: none; width: 100%; height: 100%;
+      padding: 40px clamp(20px, 4vw, 70px);
+      animation: enter 450ms cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .slide.active { display: grid; grid-template-rows: auto 1fr auto; gap: 18px; }
+
+    @keyframes enter {
+      from { opacity: 0; transform: translateY(18px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes flame-pulse {
+      0%, 100% { text-shadow: 0 0 20px rgba(255,107,44,0.6), 0 0 60px rgba(255,69,0,0.3); }
+      50% { text-shadow: 0 0 30px rgba(255,200,0,0.8), 0 0 80px rgba(255,107,44,0.5); }
+    }
+
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+    h1, h2, h3, p, ul { margin: 0; }
+
+    .kicker {
+      color: var(--accent-2);
+      letter-spacing: 0.14em; font-size: 0.85rem;
+      font-weight: 700; text-transform: uppercase;
+    }
+
+    .title {
+      font-size: clamp(2rem, 5vw, 3.8rem);
+      line-height: 1.08; text-wrap: balance;
+      animation: flame-pulse 3s ease-in-out infinite;
+    }
+
+    .subtitle { color: var(--muted); font-size: clamp(1rem, 1.6vw, 1.2rem); max-width: 85ch; }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 20px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 12px 40px rgba(255, 69, 0, 0.15), 0 4px 16px rgba(0,0,0,0.4);
+      padding: clamp(14px, 2vw, 24px);
+    }
+
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 16px; min-height: 0; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; min-height: 0; }
+
+    .list { padding-left: 20px; color: var(--muted); line-height: 1.75; font-size: clamp(0.92rem, 1.3vw, 1.08rem); }
+    .list strong { color: var(--text); }
+
+    .stat-row { display: grid; grid-template-columns: repeat(4, minmax(110px, 1fr)); gap: 12px; }
+
+    .stat {
+      padding: 14px 10px; border-radius: 16px;
+      border: 1px solid rgba(255, 160, 60, 0.4);
+      background: linear-gradient(135deg, rgba(255,107,44,0.12), rgba(255,200,0,0.06));
+      text-align: center;
+    }
+    .stat b { display: block; font-size: 1.5rem; color: var(--sun); }
+    .stat span { color: var(--muted); font-size: 0.82rem; }
+
+    .diagram-wrap {
+      width: 100%; height: 100%; min-height: 300px;
+      background: rgba(20, 8, 0, 0.7);
+      border: 1px solid rgba(255, 140, 0, 0.4);
+      border-radius: 18px; padding: 10px;
+    }
+
+    .team-grid { display: grid; grid-template-columns: repeat(4, minmax(150px, 1fr)); gap: 14px; }
+
+    .hero-card {
+      border-radius: 18px;
+      border: 1px solid rgba(255, 160, 60, 0.5);
+      background: linear-gradient(165deg, rgba(255,107,44,0.18), rgba(255,200,0,0.08));
+      padding: 16px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .hero-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(255,107,44,0.3);
+    }
+
+    .hero-emoji { font-size: 2.2rem; margin-bottom: 8px; animation: float 3s ease-in-out infinite; }
+    .hero-name { font-weight: 700; color: var(--hero); margin-bottom: 6px; font-size: 1.05rem; }
+    .hero-role { color: var(--muted); font-size: 0.88rem; min-height: 42px; }
+
+    .hero-tag {
+      margin-top: 10px; display: inline-block; padding: 4px 10px;
+      border-radius: 999px; border: 1px solid rgba(255, 200, 0, 0.6);
+      color: var(--hero); font-size: 0.76rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+
+    .footer { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 0.88rem; }
+    .controls { display: flex; gap: 10px; align-items: center; }
+
+    button {
+      border: 1px solid rgba(255, 160, 60, 0.5);
+      background: rgba(255, 107, 44, 0.08);
+      color: var(--text); border-radius: 12px;
+      padding: 8px 14px; cursor: pointer; font-weight: 600;
+      transition: all 0.2s;
+    }
+    button:hover { border-color: var(--sun); color: var(--sun); background: rgba(255, 200, 0, 0.12); }
+
+    .pill {
+      border-radius: 999px; border: 1px solid rgba(255, 140, 0, 0.4);
+      padding: 5px 12px; background: rgba(255, 107, 44, 0.08);
+      color: var(--muted); font-size: 0.8rem;
+    }
+
+    .slide-num { color: var(--accent-2); font-weight: 700; font-size: 0.9rem; }
+
+    .code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.85rem; color: #ffe4c4;
+      background: rgba(10, 4, 0, 0.6);
+      border: 1px solid rgba(255, 140, 0, 0.3);
+      padding: 12px; border-radius: 12px;
+      overflow-x: auto; white-space: pre;
+    }
+
+    .big-emoji { font-size: clamp(3rem, 8vw, 6rem); text-align: center; animation: float 2.5s ease-in-out infinite; }
+
+    .quote {
+      font-size: clamp(1.1rem, 2vw, 1.5rem);
+      font-style: italic; color: var(--sun);
+      border-left: 4px solid var(--accent);
+      padding-left: 20px; margin: 10px 0;
+    }
+
+    .timeline { display: flex; flex-direction: column; gap: 10px; }
+    .timeline-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 10px; border-radius: 12px;
+      background: rgba(255, 107, 44, 0.06);
+      border: 1px solid rgba(255, 140, 0, 0.2);
+    }
+    .timeline-num {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--lava));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.9rem; flex-shrink: 0;
+    }
+    .timeline-text { color: var(--muted); font-size: 0.95rem; line-height: 1.5; }
+    .timeline-text strong { color: var(--text); }
+
+    .badge {
+      display: inline-block; padding: 6px 14px; border-radius: 999px;
+      font-weight: 700; font-size: 0.85rem; margin: 4px;
+    }
+    .badge-fire { background: rgba(255,69,0,0.2); border: 1px solid var(--flame); color: var(--flame); }
+    .badge-gold { background: rgba(255,215,0,0.15); border: 1px solid var(--sun); color: var(--sun); }
+    .badge-green { background: rgba(127,255,107,0.1); border: 1px solid var(--good); color: var(--good); }
+
+    @media (max-width: 980px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .team-grid { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
+      .stat-row { grid-template-columns: repeat(2, minmax(110px, 1fr)); }
+      .slide { padding: 20px 14px; }
+    }
+
+    /* Extra juice */
+    .panel { transition: transform 0.2s, box-shadow 0.2s; }
+    .panel:hover { transform: translateY(-2px); box-shadow: 0 16px 50px rgba(255,69,0,0.25), 0 4px 20px rgba(0,0,0,0.5); }
+
+    .title { background: linear-gradient(135deg, #ff6b2c, #ffd700, #ff4500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+    .kicker { animation: float 4s ease-in-out infinite; }
+
+    button { position: relative; overflow: hidden; }
+    button::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, transparent, rgba(255,200,0,0.2), transparent);
+      transform: translateX(-100%); transition: transform 0.4s;
+    }
+    button:hover::after { transform: translateX(100%); }
+
+    .hero-card { transition: transform 0.3s cubic-bezier(0.23,1,0.32,1), box-shadow 0.3s; }
+
+    .timeline-item { transition: transform 0.2s, background 0.2s; }
+    .timeline-item:hover { transform: translateX(6px); background: rgba(255,107,44,0.12); }
+
+    .timeline-num { transition: transform 0.3s; }
+    .timeline-item:hover .timeline-num { transform: scale(1.15); }
+
+    .badge { transition: transform 0.2s, box-shadow 0.2s; cursor: default; }
+    .badge:hover { transform: scale(1.1); box-shadow: 0 4px 16px rgba(255,69,0,0.3); }
+
+    .stat { transition: transform 0.2s, border-color 0.2s; }
+    .stat:hover { transform: scale(1.05); border-color: var(--sun); }
+
+    /* Glow on active slide title */
+    .slide.active .title {
+      animation: flame-pulse 3s ease-in-out infinite, glow-text 2s ease-in-out infinite alternate;
+    }
+    @keyframes glow-text {
+      from { filter: brightness(1); }
+      to { filter: brightness(1.2); }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck">
+
+    <!-- SLIDE 1: Title -->
+    <section class="slide active">
+      <header>
+        <p class="kicker">🔥 Hackathon 2026 - MCU Universe Initiative 🔥</p>
+        <h1 class="title">The Fantastic 4<br/>LDRA Agent Pipeline</h1>
+        <p class="subtitle">AI-powered unit testing that writes, validates, and executes itself. No humans harmed in the making of these TCFs.</p>
+      </header>
+      <div class="panel" style="text-align:center;">
+        <div class="big-emoji">🦸‍♂️🔥🦸‍♀️⚡</div>
+        <p style="font-size:1.3rem; color:var(--sun); margin-top:12px; font-weight:700;">"It's clobberin' time... for manual test writing."</p>
+      </div>
+      <footer class="footer">
+        <span class="pill">⌨️ Arrow Keys / Buttons to Navigate</span>
+        <div class="controls">
+          <span class="slide-num">1 / 10</span>
+          <button data-prev>◀ Prev</button>
+          <button data-next>Next ▶</button>
+        </div>
+      </footer>
+    </section>
+
+    <!-- SLIDE 2: The Problem -->
+    <section class="slide">
+      <header>
+        <p class="kicker">💀 The Villain</p>
+        <h2 class="title" style="font-size:clamp(1.8rem,3.5vw,2.8rem);">Manual Unit Testing is Painful</h2>
+      </header>
+      <div class="grid-2">
+        <article class="panel">
+          <h3 style="color:var(--ember);">😤 Before (The Dark Timeline)</h3>
+          <ul class="list">
+            <li>Writing TCFs by hand... <strong>one variable at a time</strong></li>
+            <li>Forgetting edge cases = bugs in safety-critical code 💀</li>
+            <li>Copy-paste errors in test definitions</li>
+            <li>No validation = broken tests discovered <strong>too late</strong></li>
+            <li>"Works on my machine" - nobody, ever, with LDRA</li>
+          </ul>
+        </article>
+        <article class="panel">
+          <h3 style="color:var(--sun);">🦸 After (The Fantastic 4 Timeline)</h3>
+          <ul class="list">
+            <li>AI agents generate <strong>exhaustive</strong> TCFs in seconds ⚡</li>
+            <li>Every boundary, every error path, <strong>automatically</strong></li>
+            <li>Strict validator catches errors <strong>before</strong> execution</li>
+            <li>One-click pipeline: push → test → report 🚀</li>
+            <li>"It just works" - everyone, always, with our pipeline</li>
+          </ul>
+        </article>
+      </div>
+      <footer class="footer">
+        <span class="pill">🎯 Problem → Solution</span>
+        <div class="controls">
+          <span class="slide-num">2 / 10</span>
+          <button data-prev>◀ Prev</button>
+          <button data-next>Next ▶</button>
+        </div>
+      </footer>
+    </section>
+
+    <!-- SLIDE 3: The Solution Overview -->
+    <section class="slide">
+      <header>
+        <p class="kicker">🚀 Our Superpower</p>
+        <h2 class="title" style="font-size:clamp(1.8rem,3.5vw,2.8rem);">Agent-First CI Pipeline</h2>
+      </header>
+      <div class="grid-3">
+        <article class="panel" style="text-align:center;">
+          <div style="font-size:2.5rem;">🧠</div>
+          <h3 style="color:var(--sun); margin:10px 0;">Discover</h3>
+          <p class="subtitle">AI reads your C source and maps every function, every parameter, every type.</p>
+        </article>
+        <article class="panel" style="text-align:center;">
+          <div style="font-size:2.5rem;">⚒️</div>
+          <h3 style="color:var(--sun); margin:10px 0;">Generate</h3>
+          <p class="subtitle">Exhaustive test vectors: normal, boundary, and error paths. No function left behind.</p>
+        </article>
+        <article class="panel" style="text-align:center;">
+          <div style="font-size:2.5rem;">✅</div>
+          <h3 style="color:var(--sun); margin:10px 0;">Validate & Run</h3>
+          <p class="subtitle">Strict format validation + LDRA TBrun execution with record & regress.</p>
+        </article>
+      </div>
+      <div class="panel" style="margin-top:8px;">
+        <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+          <span class="badge badge-fire">MCP Protocol</span>
+          <span class="badge badge-gold">7 Specialized Agents</span>
+          <span class="badge badge-fire">FastMCP Server</span>
+          <span class="badge badge-gold">TCF Validator</span>
+          <span class="badge badge-green">100% Function Coverage</span>
+          <span class="badge badge-fire">Mock Fallback API</span>
+        </div>
+      </div>
+      <footer class="footer">
+        <span class="pill">🏗️ Built in 24 hours</span>
+        <div class="controls">
+          <span class="slide-num">3 / 10</span>
+          <button data-prev>◀ Prev</button>
+          <button data-next>Next ▶</button>
+        </div>
+      </footer>
+    </section>
+
+    <!-- SLIDE 4: Architecture -->
+    <section class="slide">
+      <header>
+        <p class="kicker">🏛️ Architecture</p>
+        <h2 class="title" style="font-size:clamp(1.6rem,3vw,2.4rem);">Agent Orchestration Flow</h2>
+      </header>
+      <div class="panel diagram-wrap">
+        <svg viewBox="0 0 1240 480" width="100%" height="100%" role="img" aria-label="LDRA architecture">
+          <defs>
+            <linearGradient id="boxWarm" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#3d1800" />
+              <stop offset="100%" stop-color="#2a1000" />
+            </linearGradient>
+            <linearGradient id="boxHot" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#4a1a00" />
+              <stop offset="100%" stop-color="#331200" />
+            </linearGradient>
+            <marker id="arr" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+              <polygon points="0,0 10,4 0,8" fill="#ffb347" />
+            </marker>
+          </defs>
+
+          <rect x="24" y="24" width="190" height="64" rx="14" fill="url(#boxWarm)" stroke="#ff8c00" stroke-width="2"/>
+          <text x="119" y="50" text-anchor="middle" fill="#fff" font-size="16" font-weight="700">🚀 GitHub Push</text>
+          <text x="119" y="72" text-anchor="middle" fill="#ffd6a8" font-size="11">source_repo, sha</text>
+
+          <rect x="260" y="24" width="190" height="64" rx="14" fill="url(#boxWarm)" stroke="#ff8c00" stroke-width="2"/>
+          <text x="355" y="50" text-anchor="middle" fill="#fff" font-size="16" font-weight="700">⚡ Trigger API</text>
+          <text x="355" y="72" text-anchor="middle" fill="#ffd6a8" font-size="11">/trigger + /status</text>
+
+          <rect x="500" y="24" width="200" height="64" rx="14" fill="url(#boxHot)" stroke="#ffd700" stroke-width="2"/>
+          <text x="600" y="50" text-anchor="middle" fill="#fff" font-size="16" font-weight="700">🧠 Orchestrator</text>
+          <text x="600" y="72" text-anchor="middle" fill="#ffe4a8" font-size="11">routing + policy</text>
+
+          <rect x="750" y="24" width="460" height="64" rx="14" fill="url(#boxHot)" stroke="#ff6b2c" stroke-width="2"/>
+          <text x="980" y="50" text-anchor="middle" fill="#fff" font-size="17" font-weight="700">🦸 Fantastic 4 Zone</text>
+          <text x="980" y="72" text-anchor="middle" fill="#ffcc99" font-size="11">Hero assignments + accountability</text>
+
+          <rect x="60" y="140" width="180" height="58" rx="12" fill="url(#boxHot)" stroke="#ffb347" stroke-width="1.5"/>
+          <text x="150" y="165" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">1. 🔍 Discovery</text>
+          <text x="150" y="184" text-anchor="middle" fill="#ffd6a8" font-size="11">files + procedures</text>
+
+          <rect x="280" y="140" width="180" height="58" rx="12" fill="url(#boxHot)" stroke="#ffb347" stroke-width="1.5"/>
+          <text x="370" y="165" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">2. 🎯 Test Data</text>
+          <text x="370" y="184" text-anchor="middle" fill="#ffd6a8" font-size="11">vectors + boundaries</text>
+
+          <rect x="500" y="140" width="180" height="58" rx="12" fill="url(#boxHot)" stroke="#ffb347" stroke-width="1.5"/>
+          <text x="590" y="165" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">3. ⚒️ TCF Build</text>
+          <text x="590" y="184" text-anchor="middle" fill="#ffd6a8" font-size="11">exhaustive assembly</text>
+
+          <rect x="720" y="140" width="180" height="58" rx="12" fill="url(#boxHot)" stroke="#ffb347" stroke-width="1.5"/>
+          <text x="810" y="165" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">4. ✅ Validate</text>
+          <text x="810" y="184" text-anchor="middle" fill="#ffd6a8" font-size="11">format + exhaustive</text>
+
+          <rect x="940" y="140" width="180" height="58" rx="12" fill="url(#boxHot)" stroke="#ffb347" stroke-width="1.5"/>
+          <text x="1030" y="165" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">5. 🏃 Execute</text>
+          <text x="1030" y="184" text-anchor="middle" fill="#ffd6a8" font-size="11">record + regress</text>
+
+          <rect x="300" y="260" width="200" height="60" rx="12" fill="url(#boxWarm)" stroke="#ff8c00" stroke-width="1.5"/>
+          <text x="400" y="285" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">6. 📦 Harvest</text>
+          <text x="400" y="304" text-anchor="middle" fill="#ffd6a8" font-size="11">LDRA artifacts only</text>
+
+          <rect x="550" y="260" width="200" height="60" rx="12" fill="url(#boxWarm)" stroke="#ff8c00" stroke-width="1.5"/>
+          <text x="650" y="285" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">7. 📊 Report</text>
+          <text x="650" y="304" text-anchor="middle" fill="#ffd6a8" font-size="11">PR status + summary</text>
+
+          <rect x="800" y="260" width="380" height="60" rx="12" fill="#2a1500" stroke="#ffd700" stroke-width="2"/>
+          <text x="990" y="285" text-anchor="middle" fill="#ffd700" font-size="14" font-weight="700">🛡️ Fallback Shield (Mock API)</text>
+          <text x="990" y="304" text-anchor="middle" fill="#ffe4a8" font-size="11">stable demo guarantee</text>
+
+          <line x1="214" y1="56" x2="260" y2="56" stroke="#ffb347" stroke-width="2.5" marker-end="url(#arr)"/>
+          <line x1="450" y1="56" x2="500" y2="56" stroke="#ffb347" stroke-width="2.5" marker-end="url(#arr)"/>
+          <line x1="600" y1="88" x2="600" y2="140" stroke="#ffb347" stroke-width="2.5" marker-end="url(#arr)"/>
+          <line x1="240" y1="169" x2="280" y2="169" stroke="#ffb347" stroke-width="2" marker-end="url(#arr)"/>
+          <line x1="460" y1="169" x2="500" y2="169" stroke="#ffb347" stroke-width="2" marker-end="url(#arr)"/>
+          <line x1="680" y1="169" x2="720" y2="169" stroke="#ffb347" stroke-width="2" marker-end="url(#arr)"/>
+          <line x1="900" y1="169" x2="940" y2="169" stroke="#ffb347" stroke-width="2" marker-end="url(#arr)"/>
+          <line x1="1030" y1="198" x2="1030" y2="260" stroke="#ffb347" stroke-width="2" marker-end="url(#arr)"/>
+          <line x1="800" y1="290" x2="750" y2="290" stroke="#ffb347" stroke-width="2" marker-end="url(#arr)"/>
+          <line x1="550" y1="290" x2="500" y2="290" stroke="#ffb347" stroke-width="2" marker-end="url(#arr)"/>
+        </svg>
+      </div>
+      <footer class="footer">
+        <span class="pill">🔥 7 Agents, 1 Pipeline, Zero Manual Work</span>
+        <div class="controls">
+          <span class="slide-num">4 / 10</span>
+          <button data-prev>◀ Prev</button>
+          <button data-next>Next ▶</button>
+        </div>
+      </footer>
+    </section>
+
+    <!-- SLIDE 5: The Team -->
+    <section class="slide">
+      <header>
+        <p class="kicker">🦸 Meet The Heroes</p>
+        <h2 class="title" style="font-size:clamp(1.8rem,3.5vw,2.8rem);">The Fantastic 4</h2>
+      </header>
+      <div class="panel">
+        <div class="team-grid">
+          <div class="hero-card">
+            <div class="hero-emoji">🔥</div>
+            <div class="hero-name">The Trigger Titan</div>
+            <div class="hero-role">Self-hosted runners, /trigger API, job lifecycle, resilience shields.</div>
+            <span class="hero-tag">Person 1</span>
+          </div>
+          <div class="hero-card">
+            <div class="hero-emoji">⚡</div>
+            <div class="hero-name">The Vector Architect</div>
+            <div class="hero-role">Function discovery, boundary analysis, test vector generation.</div>
+            <span class="hero-tag">Person 2</span>
+          </div>
+          <div class="hero-card">
+            <div class="hero-emoji">🔨</div>
+            <div class="hero-name">The TCF Forge</div>
+            <div class="hero-role">Exhaustive TCF assembly, all functions, all variables, validator-aligned.</div>
+            <span class="hero-tag">Person 3</span>
+          </div>
+          <div class="hero-card">
+            <div class="hero-emoji">🛡️</div>
+            <div class="hero-name">The Signal Guardian</div>
+            <div class="hero-role">LDRA execution, coverage reporting, CI quality gates, artifact publishing.</div>
+            <span class="hero-tag">Person 4</span>
+          </div>
+        </div>
+      </div>
+      <div class="panel" style="text-align:center; margin-top:4px;">
+        <p class="quote">"Alone we are strong. Together, we are the Fantastic 4 of unit testing."</p>
+      </div>
+      <footer class="footer">
+        <span class="pill">🤝 Team Power</span>
+        <div class="controls">
+          <span class="slide-num">5 / 10</span>
+          <button data-prev>◀ Prev</button>
+          <button data-next>Next ▶</button>
+        </div>
+      </footer>
+    </section>
+
+    <!-- SLIDE 6: How TCF Generation Works -->
+    <section class="slide">
+      <header>
+        <p class="kicker">⚒️ Deep Dive</p>
+        <h2 class="title" style="font-size:clamp(1.6rem,3vw,2.4rem);">Exhaustive TCF Generation</h2>
+      </header>
+      <div class="grid-2">
+        <article class="panel">
+          <h3 style="color:var(--sun);">How It Works</h3>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-num">1</div>
+              <div class="timeline-text"><strong>Read source</strong> — parse brakeLiftMonitoring.c</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-num">2</div>
+              <div class="timeline-text"><strong>Map functions</strong> — 8 functions discovered</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-num">3</div>
+              <div class="timeline-text"><strong>Generate vectors</strong> — normal + boundary + error</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-num">4</div>
+              <div class="timeline-text"><strong>Assemble TCF</strong> — 119 variable blocks</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-num">5</div>
+              <div class="timeline-text"><strong>Validate</strong> — strict format + exhaustiveness check</div>
+            </div>
+          </div>
+        </article>
+        <article class="panel">
+          <h3 style="color:var(--sun);">TCF Format Sample</h3>
+          <div class="code"># Begin Test Case
+  File = brakeLiftMonitoring.c
+  Procedure = initBrakeLift
+  Procedure Number = 1
+
+    # Begin Variable
+      Name = config_ptr
+      Decl_type = BrakeLiftConfig_t *
+      Usage = P
+      Value = MAP 1
+    # End Variable
+
+    # Begin Variable
+      Name = return
+      Decl_type = int
+      Usage = O
+      Value = 0
+    # End Variable
+# End Test Case</div>
+        </article>
+      </div>
+      <footer class="footer">
+        <span class="pill">📄 One TCF to rule them all</span>
+        <div class="controls">
+          <span class="slide-num">6 / 10</span>
+          <button data-prev>◀ Prev</button>
+          <button data-next>Next ▶</button>
+        </div>
+      </footer>
+    </section>
+
+    <!-- SLIDE 7: Validation -->
+    <section class="slide">
+      <header>
+        <p class="kicker">✅ Quality Gate</p>
+        <h2 class="title" style="font-size:clamp(1.6rem,3vw,2.4rem);">TCF Validator: The Bouncer</h2>
+      </header>
+      <div class="grid-2">
+        <article class="panel">
+          <h3 style="color:var(--sun);">What It Checks</h3>
+          <ul class="list">
+            <li>🔍 <strong>Structure</strong> — proper Begin/End blocks</li>
+            <li>📋 <strong>Required fields</strong> — File, Procedure, Procedure Number</li>
+            <li>🏷️ <strong>Variable completeness</strong> — Name, Decl_type, Usage, Value</li>
+            <li>🎯 <strong>Usage codes</strong> — valid I/O/H/P only</li>
+            <li>🧮 <strong>Exhaustiveness</strong> — all functions must have test cases</li>
+            <li>🔗 <strong>Pointer maps</strong> — every P has a matching H</li>
+          </ul>
+        </article>
+        <article class="panel">
+          <h3 style="color:var(--good);">Validation Result</h3>
+          <div class="code" style="color:#7fff6b;">{
+  "valid": true,
+  "test_cases": 8,
+  "total_variables": 119,
+  "functions_covered": [
+    "initBrakeLift",
+    "checkBrakeStatus",
+    "updateLiftState",
+    "processBrakeCmd",
+    "validateConfig",
+    "resetBrakeMonitor",
+    "getBrakeLiftState",
+    "handleBrakeError"
+  ],
+  "errors": []
+}</div>
+          <p style="color:var(--good); font-weight:700; margin-top:10px; text-align:center;">✅ ALL CHECKS PASSED</p>
+        </article>
+      </div>
+      <footer class="footer">
+        <span class="pill">🚫 No bad TCFs get through</span>
+        <div class="controls">
+          <span class="slide-num">7 / 10</span>
+          <button data-prev>◀ Prev</button>
+          <button data-next>Next ▶</button>
+        </div>
+      </footer>
+    </section>
+
+    <!-- SLIDE 8: Results / Scoreboard -->
+    <section class="slide">
+      <header>
+        <p class="kicker">📊 Results</p>
+        <h2 class="title" style="font-size:clamp(1.8rem,3.5vw,2.8rem);">The Scoreboard 🏆</h2>
+      </header>
+      <div class="panel">
+        <div class="stat-row">
+          <div class="stat"><b>8</b><span>Functions Tested</span></div>
+          <div class="stat"><b>119</b><span>Variable Blocks</span></div>
+          <div class="stat"><b>100%</b><span>Validation Pass</span></div>
+          <div class="stat"><b>7</b><span>Agent Stages</span></div>
+        </div>
+      </div>
+      <div class="grid-2" style="margin-top:8px;">
+        <article class="panel">
+          <h3 style="color:var(--sun);">🏅 Achievements Unlocked</h3>
+          <ul class="list">
+            <li>🔥 <strong>Zero manual TCF writing</strong></li>
+            <li>⚡ <strong>Seconds, not hours</strong> to generate tests</li>
+            <li>🛡️ <strong>Validator catches errors before LDRA</strong></li>
+            <li>🎯 <strong>Every function has test coverage</strong></li>
+            <li>🚀 <strong>Mock fallback = demo never fails</strong></li>
+          </ul>
+        </article>
+        <article class="panel">
+          <h3 style="color:var(--sun);">🎖️ Team Principles</h3>
+          <ul class="list">
+            <li>📜 <strong>No synthetic reports</strong> — LDRA artifacts only</li>
+            <li>🏗️ <strong>Exhaustive by default</strong> — no partial TCFs</li>
+            <li>🔄 <strong>Retry with backoff</strong> — transient failure handling</li>
+            <li>🎪 <strong>Demo confidence</strong> — fallback shield active</li>
+          </ul>
+        </article>
+      </div>
+      <footer class="footer">
+        <span class="pill">🏆 Achievement: Full Pipeline</span>
+        <div class="controls">
+          <span class="slide-num">8 / 10</span>
+          <button data-prev>◀ Prev</button>
+          <button data-next>Next ▶</button>
+        </div>
+      </footer>
+    </section>
+
+    <!-- SLIDE 9: Live Demo Script -->
+    <section class="slide">
+      <header>
+        <p class="kicker">🎬 Live Demo</p>
+        <h2 class="title" style="font-size:clamp(1.6rem,3vw,2.4rem);">Demo Sequence</h2>
+      </header>
+      <div class="panel">
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-num">1</div>
+            <div class="timeline-text"><strong>Show source code</strong> — brakeLiftMonitoring.c (8 functions, safety-critical)</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-num">2</div>
+            <div class="timeline-text"><strong>Run agent discovery</strong> — watch it find all functions + parameters</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-num">3</div>
+            <div class="timeline-text"><strong>Generate exhaustive TCF</strong> — 119 variable blocks in seconds</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-num">4</div>
+            <div class="timeline-text"><strong>Validate TCF</strong> — show the green "ALL CHECKS PASSED" result</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-num">5</div>
+            <div class="timeline-text"><strong>Execute in LDRA TBrun</strong> — record mode → regress mode</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-num">6</div>
+            <div class="timeline-text"><strong>Show coverage report</strong> — real LDRA artifacts, not synthetic</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-num">7</div>
+            <div class="timeline-text"><strong>Trigger fallback</strong> — /trigger → /status flow for stable demo</div>
+          </div>
+        </div>
+      </div>
+      <footer class="footer">
+        <span class="pill">🎥 7 Steps, 5 Minutes</span>
+        <div class="controls">
+          <span class="slide-num">9 / 10</span>
+          <button data-prev>◀ Prev</button>
+          <button data-next>Next ▶</button>
+        </div>
+      </footer>
+    </section>
+
+    <!-- SLIDE 10: Closing -->
+    <section class="slide">
+      <header>
+        <p class="kicker">🎤 Mic Drop</p>
+        <h2 class="title" style="font-size:clamp(2rem,4.5vw,3.5rem);">Flame On! 🔥</h2>
+      </header>
+      <div class="panel" style="text-align:center;">
+        <div class="big-emoji">🦸‍♂️🔥🦸‍♀️⚡🦸🛡️🦸‍♂️🔨</div>
+        <p class="quote" style="margin-top:20px;">"We didn't just test the code. We assembled the Avengers of CI pipelines."</p>
+        <div style="margin-top:20px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+          <span class="badge badge-fire">Agent-First</span>
+          <span class="badge badge-gold">Exhaustive</span>
+          <span class="badge badge-green">Validated</span>
+          <span class="badge badge-fire">Automated</span>
+          <span class="badge badge-gold">Safe</span>
+          <span class="badge badge-green">Fun</span>
+        </div>
+      </div>
+      <div class="panel" style="text-align:center; margin-top:8px;">
+        <h3 style="color:var(--sun); font-size:1.4rem;">Thank You! Questions? 🙋</h3>
+        <p class="subtitle" style="margin-top:8px;">Team 4 — The Fantastic 4 — Hackathon 2026</p>
+        <p style="color:var(--accent-2); margin-top:6px; font-size:0.95rem;">github.com/team4 • LDRA Agent Pipeline • Built with 🔥 and ☕</p>
+      </div>
+      <footer class="footer">
+        <span class="pill">🔥 THE END 🔥</span>
+        <div class="controls">
+          <span class="slide-num">10 / 10</span>
+          <button data-prev>◀ Prev</button>
+          <button data-next>Next ▶</button>
+        </div>
+      </footer>
+    </section>
+
+  </main>
+
+  <!-- Fire particle canvas -->
+  <canvas id="fireCanvas" style="position:fixed;inset:0;pointer-events:none;z-index:9999;"></canvas>
+
+  <!-- Progress bar -->
+  <div id="progressBar" style="position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,#ff4500,#ffd700,#ff6b2c);z-index:10000;transition:width 0.4s cubic-bezier(0.23,1,0.32,1);box-shadow:0 0 12px rgba(255,69,0,0.8);"></div>
+
+  <script>
+    (function () {
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      let index = 0;
+      const total = slides.length;
+      const progressBar = document.getElementById('progressBar');
+
+      // === FIRE PARTICLES ===
+      const canvas = document.getElementById('fireCanvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      let animFrame;
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      class Particle {
+        constructor(x, y, type) {
+          this.x = x;
+          this.y = y;
+          this.type = type; // 'fire', 'spark', 'confetti'
+          this.vx = (Math.random() - 0.5) * (type === 'confetti' ? 8 : 3);
+          this.vy = type === 'confetti' ? -(Math.random() * 8 + 4) : -(Math.random() * 3 + 1);
+          this.life = 1;
+          this.decay = type === 'confetti' ? 0.008 : (0.015 + Math.random() * 0.02);
+          this.size = type === 'confetti' ? (Math.random() * 8 + 4) : (Math.random() * 4 + 2);
+          this.color = this.pickColor();
+          this.rotation = Math.random() * 360;
+          this.rotSpeed = (Math.random() - 0.5) * 10;
+          this.gravity = type === 'confetti' ? 0.15 : -0.02;
+        }
+
+        pickColor() {
+          const fires = ['#ff4500', '#ff6b2c', '#ffb347', '#ffd700', '#ff8c00', '#ff6347'];
+          const sparks = ['#fff', '#ffe44d', '#ffcc00', '#ff9500'];
+          const confettis = ['#ff4500', '#ffd700', '#ff6b2c', '#7fff6b', '#ffb347', '#ff6347', '#fff'];
+          if (this.type === 'confetti') return confettis[Math.floor(Math.random() * confettis.length)];
+          if (this.type === 'spark') return sparks[Math.floor(Math.random() * sparks.length)];
+          return fires[Math.floor(Math.random() * fires.length)];
+        }
+
+        update() {
+          this.x += this.vx;
+          this.vy += this.gravity;
+          this.y += this.vy;
+          this.life -= this.decay;
+          this.rotation += this.rotSpeed;
+          if (this.type === 'fire') {
+            this.vx *= 0.98;
+            this.size *= 0.97;
+          }
+        }
+
+        draw() {
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, this.life);
+          ctx.translate(this.x, this.y);
+          ctx.rotate((this.rotation * Math.PI) / 180);
+
+          if (this.type === 'confetti') {
+            ctx.fillStyle = this.color;
+            ctx.fillRect(-this.size / 2, -this.size / 4, this.size, this.size / 2);
+          } else {
+            ctx.beginPath();
+            ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.shadowColor = this.color;
+            ctx.shadowBlur = this.type === 'spark' ? 8 : 4;
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+      }
+
+      function emitFire(x, y, count = 15) {
+        for (let i = 0; i < count; i++) {
+          particles.push(new Particle(x, y, Math.random() > 0.7 ? 'spark' : 'fire'));
+        }
+      }
+
+      function emitConfetti(count = 80) {
+        for (let i = 0; i < count; i++) {
+          particles.push(new Particle(
+            Math.random() * canvas.width,
+            canvas.height + 10,
+            'confetti'
+          ));
+        }
+      }
+
+      // Ambient fire emitters along bottom
+      function emitAmbient() {
+        if (Math.random() > 0.7) {
+          const x = Math.random() * canvas.width;
+          emitFire(x, canvas.height - 5, 3);
+        }
+      }
+
+      function animateParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        emitAmbient();
+        particles = particles.filter(p => p.life > 0);
+        particles.forEach(p => { p.update(); p.draw(); });
+        animFrame = requestAnimationFrame(animateParticles);
+      }
+      animateParticles();
+
+      // === SLIDE TRANSITIONS ===
+      function render() {
+        slides.forEach((s, i) => {
+          const wasActive = s.classList.contains('active');
+          s.classList.toggle('active', i === index);
+        });
+        // Update progress bar
+        progressBar.style.width = ((index + 1) / total * 100) + '%';
+        // Update all slide numbers
+        document.querySelectorAll('.slide-num').forEach(el => {
+          el.textContent = (index + 1) + ' / ' + total;
+        });
+        // Fire burst on slide change
+        emitFire(canvas.width / 2, canvas.height / 2, 20);
+        emitFire(Math.random() * canvas.width, Math.random() * canvas.height, 10);
+        // Confetti on last slide
+        if (index === total - 1) {
+          emitConfetti(120);
+          setTimeout(() => emitConfetti(60), 300);
+          setTimeout(() => emitConfetti(40), 600);
+        }
+        // Animate elements in the active slide
+        animateSlideElements();
+      }
+
+      function animateSlideElements() {
+        const active = slides[index];
+        const elements = active.querySelectorAll('.panel, .hero-card, .stat, .timeline-item, .badge');
+        elements.forEach((el, i) => {
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(20px)';
+          el.style.transition = 'none';
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              el.style.transition = `opacity 0.5s ease ${i * 0.08}s, transform 0.5s cubic-bezier(0.23,1,0.32,1) ${i * 0.08}s`;
+              el.style.opacity = '1';
+              el.style.transform = 'translateY(0)';
+            });
+          });
+        });
+      }
+
+      function next() { index = Math.min(index + 1, total - 1); render(); }
+      function prev() { index = Math.max(index - 1, 0); render(); }
+
+      // Click handlers
+      document.addEventListener('click', (e) => {
+        const t = e.target;
+        if (!(t instanceof HTMLElement)) return;
+        if (t.hasAttribute('data-next')) next();
+        if (t.hasAttribute('data-prev')) prev();
+        // Fire on click anywhere
+        emitFire(e.clientX, e.clientY, 8);
+      });
+
+      // Keyboard
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); next(); }
+        if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prev(); }
+        if (e.key === 'Home') { index = 0; render(); }
+        if (e.key === 'End') { index = total - 1; render(); }
+      });
+
+      // Touch swipe
+      let touchStartX = 0;
+      document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+      document.addEventListener('touchend', (e) => {
+        const diff = e.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(diff) > 60) { diff < 0 ? next() : prev(); }
+      });
+
+      // Mouse trail fire
+      let lastMouse = { x: 0, y: 0, time: 0 };
+      document.addEventListener('mousemove', (e) => {
+        const now = Date.now();
+        if (now - lastMouse.time > 50) {
+          emitFire(e.clientX, e.clientY, 2);
+          lastMouse = { x: e.clientX, y: e.clientY, time: now };
+        }
+      });
+
+      // === TYPING EFFECT for code blocks ===
+      function typeCode(el) {
+        const text = el.textContent;
+        el.textContent = '';
+        el.style.borderRight = '2px solid var(--sun)';
+        let i = 0;
+        const interval = setInterval(() => {
+          el.textContent += text[i];
+          i++;
+          if (i >= text.length) {
+            clearInterval(interval);
+            el.style.borderRight = 'none';
+          }
+        }, 18);
+      }
+
+      // Observe when code blocks appear
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !entry.target.dataset.typed) {
+            entry.target.dataset.typed = 'true';
+            typeCode(entry.target);
+          }
+        });
+      });
+      document.querySelectorAll('.code').forEach(el => observer.observe(el));
+
+      // === COUNTER ANIMATION for stats ===
+      function animateCounters() {
+        const active = slides[index];
+        active.querySelectorAll('.stat b').forEach(el => {
+          const target = el.textContent;
+          const num = parseInt(target);
+          if (isNaN(num)) return;
+          const suffix = target.replace(/\d+/, '');
+          let current = 0;
+          const step = Math.max(1, Math.floor(num / 30));
+          el.textContent = '0' + suffix;
+          const interval = setInterval(() => {
+            current += step;
+            if (current >= num) {
+              current = num;
+              clearInterval(interval);
+            }
+            el.textContent = current + suffix;
+          }, 30);
+        });
+      }
+
+      // Re-animate counters on slide change
+      const origRender = render;
+      const renderWithCounters = () => { origRender.call ? render() : null; animateCounters(); };
+
+      // Initial render
+      render();
+      animateCounters();
+      animateSlideElements();
+
+      // === EASTER EGG: Konami code = mega confetti ===
+      const konami = [38,38,40,40,37,39,37,39,66,65];
+      let konamiIndex = 0;
+      document.addEventListener('keydown', (e) => {
+        if (e.keyCode === konami[konamiIndex]) {
+          konamiIndex++;
+          if (konamiIndex === konami.length) {
+            konamiIndex = 0;
+            for (let i = 0; i < 5; i++) setTimeout(() => emitConfetti(200), i * 200);
+          }
+        } else {
+          konamiIndex = 0;
+        }
+      });
+
+    })();
+  </script>
+</body>
+</html>
