@@ -1,0 +1,48 @@
+
+
+ *********************************************************
+
+                   Welcome to TBrun(TM)
+
+  The LDRA Testbed Test Harness Generator Version 10.3.0
+
+    Copyright Liverpool Data Research Associates Ltd.
+
+ *********************************************************
+Initialising License
+
+License Initialisation failure
+
+Invalid host.
+(FLEXlm Code -9)
+Feature: Win_C/C++_Testbed
+Version: 10.30
+
+
+
+
+Attempting connection, retry 1 of 3
+Initialising License
+
+License Initialisation failure
+
+Invalid host.
+(FLEXlm Code -9)
+Feature: Win_C/C++_Testbed
+Version: 10.30
+
+
+
+
+Attempting connection, retry 2 of 3
+Initialising License
+
+License Initialisation failure
+
+Invalid host.
+(FLEXlm Code -9)
+Feature: Win_C/C++_Testbed
+Version: 10.30
+
+
+

@@ -6,10 +6,19 @@ running TBrun, and reading coverage results.
 
 import os
 import re
+import json
+import uuid
+import time
 import subprocess
+import argparse
 import xml.etree.ElementTree as ET
+from datetime import datetime, timezone
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from mcp.server.fastmcp import FastMCP
+try:
+    from mcp.server.fastmcp import FastMCP
+except ModuleNotFoundError:
+    FastMCP = None
 
 # ── Configuration ────────────────────────────────────────────────────────────
 LDRA_INSTALL = Path(r"C:\LDRA_Toolsuite_C_CPP_10.3.0")
@@ -17,8 +26,23 @@ LDRA_WORKAREA = Path(r"C:\LDRA_Workarea_C_CPP_10.3.0")
 CONTBRUN = LDRA_INSTALL / "Contbrun.exe"
 CONTESTBED = LDRA_INSTALL / "Contestbed.exe"
 TBINI = LDRA_INSTALL / "TBini.exe"
+MOCK_DB = Path(__file__).with_name(".mock_trigger_jobs.json")
 
-mcp = FastMCP("ldra-tbrun")
+if FastMCP is not None:
+    mcp = FastMCP("ldra-tbrun")
+else:
+    class _NoopMCP:
+        @staticmethod
+        def tool():
+            def _decorator(func):
+                return func
+            return _decorator
+
+        @staticmethod
+        def run(transport: str = "stdio"):
+            raise RuntimeError("mcp package is not installed; MCP transport is unavailable")
+
+    mcp = _NoopMCP()
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -55,6 +79,131 @@ def _exit_code_meaning(code: int) -> str:
         103: "Licensing error",
     }
     return meanings.get(code, f"Unknown exit code {code}")
+
+
+def _utc_now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _load_mock_jobs() -> dict[str, dict]:
+    if not MOCK_DB.exists():
+        return {}
+    try:
+        return json.loads(MOCK_DB.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {}
+
+
+def _save_mock_jobs(jobs: dict[str, dict]) -> None:
+    MOCK_DB.write_text(json.dumps(jobs, indent=2), encoding="utf-8")
+
+
+def _create_mock_job(source_repo: str, commit_sha: str, branch: str) -> dict:
+    jobs = _load_mock_jobs()
+    job_id = str(uuid.uuid4())
+    job = {
+        "job_id": job_id,
+        "accepted": True,
+        "mode": "mock",
+        "source_repo": source_repo,
+        "commit_sha": commit_sha,
+        "branch": branch,
+        "status": "queued",
+        "created_at": _utc_now_iso(),
+        "created_at_epoch": time.time(),
+        "updated_at": _utc_now_iso(),
+        "summary": None,
+    }
+    jobs[job_id] = job
+    _save_mock_jobs(jobs)
+    return job
+
+
+def _get_mock_job(job_id: str) -> dict | None:
+    return _load_mock_jobs().get(job_id)
+
+
+def _refresh_mock_job(job_id: str) -> dict | None:
+    jobs = _load_mock_jobs()
+    job = jobs.get(job_id)
+    if not job:
+        return None
+
+    if job.get("status") == "completed":
+        return job
+
+    age = time.time() - float(job.get("created_at_epoch", time.time()))
+    if age >= 2.0:
+        job["status"] = "completed"
+        job["summary"] = {
+            "total_tests": 3,
+            "passed": 3,
+            "failed": 0,
+            "note": "Mock pipeline result for demo without active LDRA runtime",
+        }
+    elif age >= 1.0:
+        job["status"] = "running"
+
+    job["updated_at"] = _utc_now_iso()
+    jobs[job_id] = job
+    _save_mock_jobs(jobs)
+    return job
+
+
+def _make_mock_handler():
+    class MockTriggerHandler(BaseHTTPRequestHandler):
+        def _send_json(self, status: int, payload: dict) -> None:
+            body = json.dumps(payload).encode("utf-8")
+            self.send_response(status)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def do_POST(self):
+            if self.path != "/trigger":
+                self._send_json(404, {"error": "not_found"})
+                return
+
+            try:
+                length = int(self.headers.get("Content-Length", "0"))
+                raw = self.rfile.read(length).decode("utf-8") if length else "{}"
+                data = json.loads(raw)
+            except (ValueError, json.JSONDecodeError):
+                self._send_json(400, {"error": "invalid_json"})
+                return
+
+            source_repo = str(data.get("source_repo", "unknown"))
+            commit_sha = str(data.get("commit_sha", "unknown"))
+            branch = str(data.get("branch", "unknown"))
+
+            job = _create_mock_job(source_repo, commit_sha, branch)
+            self._send_json(202, {"accepted": True, "job_id": job["job_id"], "status": "queued"})
+
+        def do_GET(self):
+            if not self.path.startswith("/status/"):
+                self._send_json(404, {"error": "not_found"})
+                return
+
+            job_id = self.path.rsplit("/", 1)[-1]
+            job = _refresh_mock_job(job_id)
+            if not job:
+                self._send_json(404, {"error": "job_not_found", "job_id": job_id})
+                return
+
+            self._send_json(200, job)
+
+        def log_message(self, _format, *_args):
+            return
+
+    return MockTriggerHandler
+
+
+def run_mock_trigger_api(host: str = "127.0.0.1", port: int = 8000) -> None:
+    server = ThreadingHTTPServer((host, port), _make_mock_handler())
+    print(f"Mock trigger API listening on http://{host}:{port}")
+    print("Endpoints: POST /trigger, GET /status/<job_id>")
+    server.serve_forever()
 
 
 # ── Tools ─────────────────────────────────────────────────────────────────────
@@ -334,7 +483,32 @@ def set_tbini(key: str, value: str, section: str = "") -> str:
         return "ERROR: TBini timed out"
 
 
+@mcp.tool()
+def mock_trigger(source_repo: str, commit_sha: str, branch: str) -> dict:
+    """Create a mock trigger job for demo flows without active LDRA runtime."""
+    job = _create_mock_job(source_repo, commit_sha, branch)
+    return {"accepted": True, "job_id": job["job_id"], "status": "queued"}
+
+
+@mcp.tool()
+def mock_status(job_id: str) -> dict:
+    """Get status for a mock trigger job."""
+    job = _refresh_mock_job(job_id)
+    if not job:
+        return {"error": "job_not_found", "job_id": job_id}
+    return job
+
+
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    mcp.run(transport="stdio")
+    parser = argparse.ArgumentParser(description="LDRA TBrun MCP Server")
+    parser.add_argument("--run-mock-trigger-api", action="store_true", help="Run demo HTTP trigger API")
+    parser.add_argument("--host", default="127.0.0.1", help="Host for mock trigger API")
+    parser.add_argument("--port", type=int, default=8000, help="Port for mock trigger API")
+    args = parser.parse_args()
+
+    if args.run_mock_trigger_api:
+        run_mock_trigger_api(host=args.host, port=args.port)
+    else:
+        mcp.run(transport="stdio")

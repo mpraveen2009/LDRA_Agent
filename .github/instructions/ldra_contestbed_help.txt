@@ -1,0 +1,37 @@
+Initialising License
+
+License Initialisation failure
+
+Invalid host.
+(FLEXlm Code -9)
+Feature: Win_C/C++_Testbed
+Version: 10.30
+
+
+
+
+Attempting connection, retry 1 of 3
+Initialising License
+
+License Initialisation failure
+
+Invalid host.
+(FLEXlm Code -9)
+Feature: Win_C/C++_Testbed
+Version: 10.30
+
+
+
+
+Attempting connection, retry 2 of 3
+Initialising License
+
+License Initialisation failure
+
+Invalid host.
+(FLEXlm Code -9)
+Feature: Win_C/C++_Testbed
+Version: 10.30
+
+
+

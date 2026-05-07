@@ -1,0 +1,13 @@
+NAME
+    tbini - Add/Remove/Edit ini Flags
+
+SYNOPSIS
+    tbini [-Profile='<lang>' || -Section='<section_name>'] KEY[=VALUE]
+
+OPTIONS
+    -Profile=   specify language for 'LDRA Testbed' section
+
+    -Section=   specify full section name
+
+Version: 10.3.0
+Copyright: LDRA Ltd 2024
