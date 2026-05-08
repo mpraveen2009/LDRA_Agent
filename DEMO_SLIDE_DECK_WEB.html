@@ -6,22 +6,22 @@
   <title>🔥 LDRA Agent Demo - The Fantastic 4 🔥</title>
   <style>
     :root {
-      --bg-1: #1a0a00;
-      --bg-2: #2d1200;
-      --panel: rgba(45, 18, 0, 0.82);
-      --panel-border: rgba(255, 160, 60, 0.45);
-      --text: #fff8f0;
-      --muted: #ffd6a8;
-      --accent: #ff6b2c;
-      --accent-2: #ffb347;
-      --warn: #ffe44d;
-      --danger: #ff4444;
-      --hero: #ffcc00;
-      --good: #7fff6b;
-      --flame: #ff4500;
-      --lava: #ff8c00;
-      --sun: #ffd700;
-      --ember: #ff6347;
+      --bg-1: #f8f9fa;
+      --bg-2: #ffffff;
+      --panel: rgba(255, 255, 255, 0.95);
+      --panel-border: rgba(0, 90, 158, 0.2);
+      --text: #1a1a1a;
+      --muted: #4a4a4a;
+      --accent: #005a9e;
+      --accent-2: #0078d4;
+      --warn: #ff8c00;
+      --danger: #d32f2f;
+      --hero: #005a9e;
+      --good: #2e7d32;
+      --flame: #005a9e;
+      --lava: #0078d4;
+      --sun: #005a9e;
+      --ember: #d32f2f;
     }
 
     * { box-sizing: border-box; }
@@ -30,12 +30,7 @@
       margin: 0; height: 100%; overflow: hidden;
       color: var(--text);
       font-family: "Segoe UI", "Trebuchet MS", Tahoma, sans-serif;
-      background:
-        radial-gradient(circle at 15% 10%, rgba(255, 107, 44, 0.35), transparent 40%),
-        radial-gradient(circle at 85% 15%, rgba(255, 200, 0, 0.25), transparent 35%),
-        radial-gradient(circle at 50% 90%, rgba(255, 69, 0, 0.3), transparent 45%),
-        radial-gradient(circle at 70% 60%, rgba(255, 140, 0, 0.15), transparent 35%),
-        linear-gradient(160deg, var(--bg-1), var(--bg-2));
+      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
     }
 
     .deck { position: relative; width: 100%; height: 100%; isolation: isolate; }
@@ -43,8 +38,8 @@
     .deck::before {
       content: ""; position: absolute; inset: 0;
       background-image:
-        linear-gradient(rgba(255, 140, 0, 0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 140, 0, 0.04) 1px, transparent 1px);
+        linear-gradient(rgba(0, 90, 158, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 90, 158, 0.03) 1px, transparent 1px);
       background-size: 36px 36px;
       pointer-events: none; z-index: -1;
     }
@@ -53,6 +48,13 @@
       display: none; width: 100%; height: 100%;
       padding: 40px clamp(20px, 4vw, 70px);
       animation: enter 450ms cubic-bezier(0.23, 1, 0.32, 1);
+      position: relative;
+    }
+
+    .slide::before {
+      content: "KONE"; position: absolute; top: 20px; right: 30px;
+      font-size: 1.4rem; font-weight: 900; color: var(--accent);
+      letter-spacing: 0.08em; z-index: 100;
     }
 
     .slide.active { display: grid; grid-template-rows: auto 1fr auto; gap: 18px; }
@@ -90,7 +92,7 @@
       border: 1px solid var(--panel-border);
       border-radius: 20px;
       backdrop-filter: blur(6px);
-      box-shadow: 0 12px 40px rgba(255, 69, 0, 0.15), 0 4px 16px rgba(0,0,0,0.4);
+      box-shadow: 0 2px 12px rgba(0, 90, 158, 0.08);
       padding: clamp(14px, 2vw, 24px);
     }
 
@@ -104,17 +106,17 @@
 
     .stat {
       padding: 14px 10px; border-radius: 16px;
-      border: 1px solid rgba(255, 160, 60, 0.4);
-      background: linear-gradient(135deg, rgba(255,107,44,0.12), rgba(255,200,0,0.06));
+      border: 1px solid rgba(0, 90, 158, 0.15);
+      background: linear-gradient(135deg, rgba(0, 122, 212, 0.06), rgba(0, 90, 158, 0.03));
       text-align: center;
     }
-    .stat b { display: block; font-size: 1.5rem; color: var(--sun); }
+    .stat b { display: block; font-size: 1.5rem; color: var(--accent); }
     .stat span { color: var(--muted); font-size: 0.82rem; }
 
     .diagram-wrap {
       width: 100%; height: 100%; min-height: 300px;
-      background: rgba(20, 8, 0, 0.7);
-      border: 1px solid rgba(255, 140, 0, 0.4);
+      background: rgba(240, 245, 250, 0.8);
+      border: 1px solid rgba(0, 90, 158, 0.2);
       border-radius: 18px; padding: 10px;
     }
 
@@ -122,14 +124,14 @@
 
     .hero-card {
       border-radius: 18px;
-      border: 1px solid rgba(255, 160, 60, 0.5);
-      background: linear-gradient(165deg, rgba(255,107,44,0.18), rgba(255,200,0,0.08));
+      border: 1px solid rgba(0, 90, 158, 0.15);
+      background: linear-gradient(165deg, rgba(0, 122, 212, 0.08), rgba(0, 90, 158, 0.04));
       padding: 16px;
       transition: transform 0.2s, box-shadow 0.2s;
     }
     .hero-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 12px 30px rgba(255,107,44,0.3);
+      box-shadow: 0 8px 24px rgba(0, 90, 158, 0.15);
     }
 
     .hero-emoji { font-size: 2.2rem; margin-bottom: 8px; animation: float 3s ease-in-out infinite; }
@@ -147,27 +149,27 @@
     .controls { display: flex; gap: 10px; align-items: center; }
 
     button {
-      border: 1px solid rgba(255, 160, 60, 0.5);
-      background: rgba(255, 107, 44, 0.08);
-      color: var(--text); border-radius: 12px;
+      border: 1px solid rgba(0, 90, 158, 0.3);
+      background: rgba(0, 122, 212, 0.08);
+      color: var(--accent); border-radius: 12px;
       padding: 8px 14px; cursor: pointer; font-weight: 600;
       transition: all 0.2s;
     }
-    button:hover { border-color: var(--sun); color: var(--sun); background: rgba(255, 200, 0, 0.12); }
+    button:hover { border-color: var(--accent); color: var(--accent); background: rgba(0, 122, 212, 0.15); }
 
     .pill {
-      border-radius: 999px; border: 1px solid rgba(255, 140, 0, 0.4);
-      padding: 5px 12px; background: rgba(255, 107, 44, 0.08);
-      color: var(--muted); font-size: 0.8rem;
+      border-radius: 999px; border: 1px solid rgba(0, 90, 158, 0.2);
+      padding: 5px 12px; background: rgba(0, 122, 212, 0.06);
+      color: var(--accent); font-size: 0.8rem; font-weight: 600;
     }
 
     .slide-num { color: var(--accent-2); font-weight: 700; font-size: 0.9rem; }
 
     .code {
       font-family: Consolas, "Courier New", monospace;
-      font-size: 0.85rem; color: #ffe4c4;
-      background: rgba(10, 4, 0, 0.6);
-      border: 1px solid rgba(255, 140, 0, 0.3);
+      font-size: 0.85rem; color: #1a1a1a;
+      background: rgba(240, 245, 250, 0.8);
+      border: 1px solid rgba(0, 90, 158, 0.15);
       padding: 12px; border-radius: 12px;
       overflow-x: auto; white-space: pre;
     }
@@ -176,7 +178,7 @@
 
     .quote {
       font-size: clamp(1.1rem, 2vw, 1.5rem);
-      font-style: italic; color: var(--sun);
+      font-style: italic; color: var(--accent);
       border-left: 4px solid var(--accent);
       padding-left: 20px; margin: 10px 0;
     }
@@ -185,14 +187,14 @@
     .timeline-item {
       display: flex; align-items: flex-start; gap: 12px;
       padding: 10px; border-radius: 12px;
-      background: rgba(255, 107, 44, 0.06);
-      border: 1px solid rgba(255, 140, 0, 0.2);
+      background: rgba(0, 122, 212, 0.04);
+      border: 1px solid rgba(0, 90, 158, 0.1);
     }
     .timeline-num {
       width: 32px; height: 32px; border-radius: 50%;
       background: linear-gradient(135deg, var(--accent), var(--lava));
       display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 0.9rem; flex-shrink: 0;
+      font-weight: 700; font-size: 0.9rem; flex-shrink: 0; color: white;
     }
     .timeline-text { color: var(--muted); font-size: 0.95rem; line-height: 1.5; }
     .timeline-text strong { color: var(--text); }
@@ -237,7 +239,7 @@
     .timeline-item:hover .timeline-num { transform: scale(1.15); }
 
     .badge { transition: transform 0.2s, box-shadow 0.2s; cursor: default; }
-    .badge:hover { transform: scale(1.1); box-shadow: 0 4px 16px rgba(255,69,0,0.3); }
+    .badge:hover { transform: scale(1.1); box-shadow: 0 4px 16px rgba(0, 90, 158, 0.2); }
 
     .stat { transition: transform 0.2s, border-color 0.2s; }
     .stat:hover { transform: scale(1.05); border-color: var(--sun); }
@@ -259,7 +261,7 @@
     <section class="slide active">
       <header>
         <p class="kicker">🔥 Hackathon 2026 - MCU Universe Initiative 🔥</p>
-        <h1 class="title">The Fantastic 4<br/>LDRA Agent Pipeline</h1>
+        <h1 class="title">AI Wingmen<br/>LDRA Agent Pipeline</h1>
         <p class="subtitle">AI-powered unit testing that writes, validates, and executes itself. No humans harmed in the making of these TCFs.</p>
       </header>
       <div class="panel" style="text-align:center;">
@@ -269,7 +271,7 @@
       <footer class="footer">
         <span class="pill">⌨️ Arrow Keys / Buttons to Navigate</span>
         <div class="controls">
-          <span class="slide-num">1 / 10</span>
+          <span class="slide-num">1 / 9</span>
           <button data-prev>◀ Prev</button>
           <button data-next>Next ▶</button>
         </div>
@@ -304,10 +306,27 @@
           </ul>
         </article>
       </div>
+      <div class="panel" style="margin-top:12px; background:rgba(0, 122, 212, 0.06); border:1px solid #0078d4; border-radius:8px; padding:14px;">
+        <h3 style="color:var(--sun); text-align:center; margin-bottom:12px; font-size:1.1rem;">📊 Business Case Metrics</h3>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; text-align:center;">
+          <div>
+            <div style="font-size:0.95rem; color:#005a9e; margin-bottom:4px;"><strong>❌ Manual Approach</strong></div>
+            <div style="font-size:1.8rem; font-weight:700; color:#d32f2f;">24+ hrs</div>
+            <div style="font-size:0.85rem; color:#666;">per test suite</div>
+            <div style="font-size:0.9rem; color:#666; margin-top:8px;">👤 1 person, sequential</div>
+          </div>
+          <div>
+            <div style="font-size:0.95rem; color:#2e7d32; margin-bottom:4px;"><strong>✅ Agentic Pipeline</strong></div>
+            <div style="font-size:1.8rem; font-weight:700; color:#2e7d32;">~25 min</div>
+            <div style="font-size:0.85rem; color:#666;">fully automated</div>
+            <div style="font-size:0.9rem; color:#666; margin-top:8px;">💻 1 PC, all agents</div>
+          </div>
+        </div>
+      </div>
       <footer class="footer">
         <span class="pill">🎯 Problem → Solution</span>
         <div class="controls">
-          <span class="slide-num">2 / 10</span>
+          <span class="slide-num">2 / 9</span>
           <button data-prev>◀ Prev</button>
           <button data-next>Next ▶</button>
         </div>
@@ -350,7 +369,7 @@
       <footer class="footer">
         <span class="pill">🏗️ Built in 24 hours</span>
         <div class="controls">
-          <span class="slide-num">3 / 10</span>
+          <span class="slide-num">3 / 9</span>
           <button data-prev>◀ Prev</button>
           <button data-next>Next ▶</button>
         </div>
@@ -367,136 +386,75 @@
         <svg viewBox="0 0 1240 480" width="100%" height="100%" role="img" aria-label="LDRA architecture">
           <defs>
             <linearGradient id="boxWarm" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#3d1800" />
-              <stop offset="100%" stop-color="#2a1000" />
+              <stop offset="0%" stop-color="#e8f0f8" />
+              <stop offset="100%" stop-color="#d4e6f5" />
             </linearGradient>
             <linearGradient id="boxHot" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#4a1a00" />
-              <stop offset="100%" stop-color="#331200" />
+              <stop offset="0%" stop-color="#d4e6f5" />
+              <stop offset="100%" stop-color="#c0ddf0" />
             </linearGradient>
             <marker id="arr" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
-              <polygon points="0,0 10,4 0,8" fill="#ffb347" />
+              <polygon points="0,0 10,4 0,8" fill="#005a9e" />
             </marker>
           </defs>
 
-          <rect x="24" y="24" width="190" height="64" rx="14" fill="url(#boxWarm)" stroke="#ff8c00" stroke-width="2"/>
-          <text x="119" y="50" text-anchor="middle" fill="#fff" font-size="16" font-weight="700">🚀 GitHub Push</text>
-          <text x="119" y="72" text-anchor="middle" fill="#ffd6a8" font-size="11">source_repo, sha</text>
+          <rect x="24" y="24" width="680" height="64" rx="14" fill="url(#boxHot)" stroke="#005a9e" stroke-width="2"/>
+          <text x="364" y="48" text-anchor="middle" fill="#1a1a1a" font-size="16" font-weight="700">⚙️ GitHub Actions</text>
+          <text x="364" y="67" text-anchor="middle" fill="#4a4a4a" font-size="11">push → trigger API → orchestrate → route</text>
 
-          <rect x="260" y="24" width="190" height="64" rx="14" fill="url(#boxWarm)" stroke="#ff8c00" stroke-width="2"/>
-          <text x="355" y="50" text-anchor="middle" fill="#fff" font-size="16" font-weight="700">⚡ Trigger API</text>
-          <text x="355" y="72" text-anchor="middle" fill="#ffd6a8" font-size="11">/trigger + /status</text>
+          <rect x="750" y="24" width="460" height="64" rx="14" fill="url(#boxHot)" stroke="#005a9e" stroke-width="2"/>
+          <text x="980" y="50" text-anchor="middle" fill="#1a1a1a" font-size="17" font-weight="700">🦸 Fantastic 4 Zone</text>
+          <text x="980" y="72" text-anchor="middle" fill="#4a4a4a" font-size="11">Hero assignments + accountability</text>
 
-          <rect x="500" y="24" width="200" height="64" rx="14" fill="url(#boxHot)" stroke="#ffd700" stroke-width="2"/>
-          <text x="600" y="50" text-anchor="middle" fill="#fff" font-size="16" font-weight="700">🧠 Orchestrator</text>
-          <text x="600" y="72" text-anchor="middle" fill="#ffe4a8" font-size="11">routing + policy</text>
+          <rect x="60" y="140" width="180" height="58" rx="12" fill="url(#boxHot)" stroke="#005a9e" stroke-width="1.5"/>
+          <text x="150" y="165" text-anchor="middle" fill="#1a1a1a" font-size="14" font-weight="700">1. 🔍 Discovery</text>
+          <text x="150" y="184" text-anchor="middle" fill="#4a4a4a" font-size="11">files + procedures</text>
 
-          <rect x="750" y="24" width="460" height="64" rx="14" fill="url(#boxHot)" stroke="#ff6b2c" stroke-width="2"/>
-          <text x="980" y="50" text-anchor="middle" fill="#fff" font-size="17" font-weight="700">🦸 Fantastic 4 Zone</text>
-          <text x="980" y="72" text-anchor="middle" fill="#ffcc99" font-size="11">Hero assignments + accountability</text>
+          <rect x="280" y="140" width="180" height="58" rx="12" fill="url(#boxHot)" stroke="#005a9e" stroke-width="1.5"/>
+          <text x="370" y="165" text-anchor="middle" fill="#1a1a1a" font-size="14" font-weight="700">2. 🎯 Test Data</text>
+          <text x="370" y="184" text-anchor="middle" fill="#4a4a4a" font-size="11">vectors + boundaries</text>
 
-          <rect x="60" y="140" width="180" height="58" rx="12" fill="url(#boxHot)" stroke="#ffb347" stroke-width="1.5"/>
-          <text x="150" y="165" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">1. 🔍 Discovery</text>
-          <text x="150" y="184" text-anchor="middle" fill="#ffd6a8" font-size="11">files + procedures</text>
+          <rect x="500" y="140" width="180" height="58" rx="12" fill="url(#boxHot)" stroke="#005a9e" stroke-width="1.5"/>
+          <text x="590" y="165" text-anchor="middle" fill="#1a1a1a" font-size="14" font-weight="700">3. ⚒️ TCF Build</text>
+          <text x="590" y="184" text-anchor="middle" fill="#4a4a4a" font-size="11">exhaustive assembly</text>
 
-          <rect x="280" y="140" width="180" height="58" rx="12" fill="url(#boxHot)" stroke="#ffb347" stroke-width="1.5"/>
-          <text x="370" y="165" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">2. 🎯 Test Data</text>
-          <text x="370" y="184" text-anchor="middle" fill="#ffd6a8" font-size="11">vectors + boundaries</text>
+          <rect x="720" y="140" width="180" height="58" rx="12" fill="url(#boxHot)" stroke="#005a9e" stroke-width="1.5"/>
+          <text x="810" y="165" text-anchor="middle" fill="#1a1a1a" font-size="14" font-weight="700">4. ✅ Validate</text>
+          <text x="810" y="184" text-anchor="middle" fill="#4a4a4a" font-size="11">format + exhaustive</text>
 
-          <rect x="500" y="140" width="180" height="58" rx="12" fill="url(#boxHot)" stroke="#ffb347" stroke-width="1.5"/>
-          <text x="590" y="165" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">3. ⚒️ TCF Build</text>
-          <text x="590" y="184" text-anchor="middle" fill="#ffd6a8" font-size="11">exhaustive assembly</text>
+          <rect x="940" y="140" width="180" height="58" rx="12" fill="url(#boxHot)" stroke="#005a9e" stroke-width="1.5"/>
+          <text x="1030" y="165" text-anchor="middle" fill="#1a1a1a" font-size="14" font-weight="700">5. 🏃 Execute</text>
+          <text x="1030" y="184" text-anchor="middle" fill="#4a4a4a" font-size="11">record + regress</text>
 
-          <rect x="720" y="140" width="180" height="58" rx="12" fill="url(#boxHot)" stroke="#ffb347" stroke-width="1.5"/>
-          <text x="810" y="165" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">4. ✅ Validate</text>
-          <text x="810" y="184" text-anchor="middle" fill="#ffd6a8" font-size="11">format + exhaustive</text>
+          <rect x="300" y="260" width="200" height="60" rx="12" fill="url(#boxWarm)" stroke="#005a9e" stroke-width="1.5"/>
+          <text x="400" y="285" text-anchor="middle" fill="#1a1a1a" font-size="14" font-weight="700">7. 📊 Report</text>
+          <text x="400" y="304" text-anchor="middle" fill="#4a4a4a" font-size="11">PR status + summary</text>
 
-          <rect x="940" y="140" width="180" height="58" rx="12" fill="url(#boxHot)" stroke="#ffb347" stroke-width="1.5"/>
-          <text x="1030" y="165" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">5. 🏃 Execute</text>
-          <text x="1030" y="184" text-anchor="middle" fill="#ffd6a8" font-size="11">record + regress</text>
+          <rect x="550" y="260" width="200" height="60" rx="12" fill="url(#boxWarm)" stroke="#005a9e" stroke-width="1.5"/>
+          <text x="650" y="285" text-anchor="middle" fill="#1a1a1a" font-size="14" font-weight="700">6. 📦 Harvest</text>
+          <text x="650" y="304" text-anchor="middle" fill="#4a4a4a" font-size="11">LDRA artifacts only</text>
 
-          <rect x="300" y="260" width="200" height="60" rx="12" fill="url(#boxWarm)" stroke="#ff8c00" stroke-width="1.5"/>
-          <text x="400" y="285" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">6. 📦 Harvest</text>
-          <text x="400" y="304" text-anchor="middle" fill="#ffd6a8" font-size="11">LDRA artifacts only</text>
-
-          <rect x="550" y="260" width="200" height="60" rx="12" fill="url(#boxWarm)" stroke="#ff8c00" stroke-width="1.5"/>
-          <text x="650" y="285" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">7. 📊 Report</text>
-          <text x="650" y="304" text-anchor="middle" fill="#ffd6a8" font-size="11">PR status + summary</text>
-
-          <rect x="800" y="260" width="380" height="60" rx="12" fill="#2a1500" stroke="#ffd700" stroke-width="2"/>
-          <text x="990" y="285" text-anchor="middle" fill="#ffd700" font-size="14" font-weight="700">🛡️ Fallback Shield (Mock API)</text>
-          <text x="990" y="304" text-anchor="middle" fill="#ffe4a8" font-size="11">stable demo guarantee</text>
-
-          <line x1="214" y1="56" x2="260" y2="56" stroke="#ffb347" stroke-width="2.5" marker-end="url(#arr)"/>
-          <line x1="450" y1="56" x2="500" y2="56" stroke="#ffb347" stroke-width="2.5" marker-end="url(#arr)"/>
-          <line x1="600" y1="88" x2="600" y2="140" stroke="#ffb347" stroke-width="2.5" marker-end="url(#arr)"/>
-          <line x1="240" y1="169" x2="280" y2="169" stroke="#ffb347" stroke-width="2" marker-end="url(#arr)"/>
-          <line x1="460" y1="169" x2="500" y2="169" stroke="#ffb347" stroke-width="2" marker-end="url(#arr)"/>
-          <line x1="680" y1="169" x2="720" y2="169" stroke="#ffb347" stroke-width="2" marker-end="url(#arr)"/>
-          <line x1="900" y1="169" x2="940" y2="169" stroke="#ffb347" stroke-width="2" marker-end="url(#arr)"/>
-          <line x1="1030" y1="198" x2="1030" y2="260" stroke="#ffb347" stroke-width="2" marker-end="url(#arr)"/>
-          <line x1="800" y1="290" x2="750" y2="290" stroke="#ffb347" stroke-width="2" marker-end="url(#arr)"/>
-          <line x1="550" y1="290" x2="500" y2="290" stroke="#ffb347" stroke-width="2" marker-end="url(#arr)"/>
+          <line x1="150" y1="88" x2="150" y2="140" stroke="#005a9e" stroke-width="2.5" marker-end="url(#arr)"/>
+          <line x1="240" y1="169" x2="280" y2="169" stroke="#005a9e" stroke-width="2" marker-end="url(#arr)"/>
+          <line x1="460" y1="169" x2="500" y2="169" stroke="#005a9e" stroke-width="2" marker-end="url(#arr)"/>
+          <line x1="680" y1="169" x2="720" y2="169" stroke="#005a9e" stroke-width="2" marker-end="url(#arr)"/>
+          <line x1="900" y1="169" x2="940" y2="169" stroke="#005a9e" stroke-width="2" marker-end="url(#arr)"/>
+          <line x1="1030" y1="198" x2="1030" y2="290" stroke="#005a9e" stroke-width="2"/>
+          <line x1="1030" y1="290" x2="750" y2="290" stroke="#005a9e" stroke-width="2" marker-end="url(#arr)"/>
+          <line x1="550" y1="290" x2="500" y2="290" stroke="#005a9e" stroke-width="2" marker-end="url(#arr)"/>
         </svg>
       </div>
       <footer class="footer">
         <span class="pill">🔥 8 Agents, 1 Pipeline, Zero Manual Work</span>
         <div class="controls">
-          <span class="slide-num">4 / 10</span>
+          <span class="slide-num">4 / 9</span>
           <button data-prev>◀ Prev</button>
           <button data-next>Next ▶</button>
         </div>
       </footer>
     </section>
 
-    <!-- SLIDE 5: The Team -->
-    <section class="slide">
-      <header>
-        <p class="kicker">🦸 Meet The Heroes</p>
-        <h2 class="title" style="font-size:clamp(1.8rem,3.5vw,2.8rem);">The Fantastic 4</h2>
-      </header>
-      <div class="panel">
-        <div class="team-grid">
-          <div class="hero-card">
-            <div class="hero-emoji">🔥</div>
-            <div class="hero-name">The Trigger Titan</div>
-            <div class="hero-role">Self-hosted runners, /trigger API, job lifecycle, resilience shields.</div>
-            <span class="hero-tag">Person 1</span>
-          </div>
-          <div class="hero-card">
-            <div class="hero-emoji">⚡</div>
-            <div class="hero-name">The Vector Architect</div>
-            <div class="hero-role">Function discovery, boundary analysis, test vector generation.</div>
-            <span class="hero-tag">Person 2</span>
-          </div>
-          <div class="hero-card">
-            <div class="hero-emoji">🔨</div>
-            <div class="hero-name">The TCF Forge</div>
-            <div class="hero-role">Exhaustive TCF assembly, all functions, all variables, validator-aligned.</div>
-            <span class="hero-tag">Person 3</span>
-          </div>
-          <div class="hero-card">
-            <div class="hero-emoji">🛡️</div>
-            <div class="hero-name">The Signal Guardian</div>
-            <div class="hero-role">LDRA execution, coverage reporting, CI quality gates, artifact publishing.</div>
-            <span class="hero-tag">Person 4</span>
-          </div>
-        </div>
-      </div>
-      <div class="panel" style="text-align:center; margin-top:4px;">
-        <p class="quote">"Alone we are strong. Together, we are the Fantastic 4 of unit testing."</p>
-      </div>
-      <footer class="footer">
-        <span class="pill">🤝 Team Power</span>
-        <div class="controls">
-          <span class="slide-num">5 / 10</span>
-          <button data-prev>◀ Prev</button>
-          <button data-next>Next ▶</button>
-        </div>
-      </footer>
-    </section>
-
-    <!-- SLIDE 6: How TCF Generation Works -->
+    <!-- SLIDE 5: How TCF Generation Works -->
     <section class="slide">
       <header>
         <p class="kicker">⚒️ Deep Dive</p>
@@ -555,14 +513,14 @@
       <footer class="footer">
         <span class="pill">📄 One TCF to rule them all</span>
         <div class="controls">
-          <span class="slide-num">6 / 10</span>
+          <span class="slide-num">5 / 9</span>
           <button data-prev>◀ Prev</button>
           <button data-next>Next ▶</button>
         </div>
       </footer>
     </section>
 
-    <!-- SLIDE 7: Validation -->
+    <!-- SLIDE 6: Validation -->
     <section class="slide">
       <header>
         <p class="kicker">✅ Quality Gate</p>
@@ -606,14 +564,14 @@
       <footer class="footer">
         <span class="pill">🚫 No bad TCFs get through</span>
         <div class="controls">
-          <span class="slide-num">7 / 10</span>
+          <span class="slide-num">6 / 9</span>
           <button data-prev>◀ Prev</button>
           <button data-next>Next ▶</button>
         </div>
       </footer>
     </section>
 
-    <!-- SLIDE 8: Results / Scoreboard -->
+    <!-- SLIDE 7: Results / Scoreboard -->
     <section class="slide">
       <header>
         <p class="kicker">📊 Results</p>
@@ -644,21 +602,21 @@
             <li>📜 <strong>No synthetic reports</strong> — LDRA artifacts only</li>
             <li>🏗️ <strong>Exhaustive by default</strong> — no partial TCFs</li>
             <li>🔄 <strong>Retry with backoff</strong> — transient failure handling</li>
-            <li>🎪 <strong>Demo confidence</strong> — fallback shield active</li>
+
           </ul>
         </article>
       </div>
       <footer class="footer">
         <span class="pill">🏆 Achievement: Full Pipeline</span>
         <div class="controls">
-          <span class="slide-num">8 / 10</span>
+          <span class="slide-num">7 / 9</span>
           <button data-prev>◀ Prev</button>
           <button data-next>Next ▶</button>
         </div>
       </footer>
     </section>
 
-    <!-- SLIDE 9: Live Demo Script -->
+    <!-- SLIDE 8: Live Demo Script -->
     <section class="slide">
       <header>
         <p class="kicker">🎬 Live Demo</p>
@@ -699,14 +657,14 @@
       <footer class="footer">
         <span class="pill">🎥 7 Steps, 8 Agents, 10 MCP Tools</span>
         <div class="controls">
-          <span class="slide-num">9 / 10</span>
+          <span class="slide-num">8 / 9</span>
           <button data-prev>◀ Prev</button>
           <button data-next>Next ▶</button>
         </div>
       </footer>
     </section>
 
-    <!-- SLIDE 10: Closing -->
+    <!-- SLIDE 9: Closing -->
     <section class="slide">
       <header>
         <p class="kicker">🎤 Mic Drop</p>
@@ -732,7 +690,7 @@
       <footer class="footer">
         <span class="pill">🔥 THE END 🔥</span>
         <div class="controls">
-          <span class="slide-num">10 / 10</span>
+          <span class="slide-num">9 / 9</span>
           <button data-prev>◀ Prev</button>
           <button data-next>Next ▶</button>
         </div>
