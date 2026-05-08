@@ -340,11 +340,11 @@
       <div class="panel" style="margin-top:8px;">
         <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
           <span class="badge badge-fire">MCP Protocol</span>
-          <span class="badge badge-gold">7 Specialized Agents</span>
-          <span class="badge badge-fire">FastMCP Server</span>
-          <span class="badge badge-gold">TCF Validator</span>
+          <span class="badge badge-gold">8 Specialized Agents</span>
+          <span class="badge badge-fire">FastMCP Server (10 Tools)</span>
+          <span class="badge badge-gold">25 Test Cases Generated</span>
           <span class="badge badge-green">100% Function Coverage</span>
-          <span class="badge badge-fire">Mock Fallback API</span>
+          <span class="badge badge-fire">TBrun Record + Regress PASS</span>
         </div>
       </div>
       <footer class="footer">
@@ -440,7 +440,7 @@
         </svg>
       </div>
       <footer class="footer">
-        <span class="pill">🔥 7 Agents, 1 Pipeline, Zero Manual Work</span>
+        <span class="pill">🔥 8 Agents, 1 Pipeline, Zero Manual Work</span>
         <div class="controls">
           <span class="slide-num">4 / 10</span>
           <button data-prev>◀ Prev</button>
@@ -516,15 +516,15 @@
             </div>
             <div class="timeline-item">
               <div class="timeline-num">3</div>
-              <div class="timeline-text"><strong>Generate vectors</strong> — normal + boundary + error</div>
+              <div class="timeline-text"><strong>Generate vectors</strong> — normal + boundary + error paths per branch</div>
             </div>
             <div class="timeline-item">
               <div class="timeline-num">4</div>
-              <div class="timeline-text"><strong>Assemble TCF</strong> — 119 variable blocks</div>
+              <div class="timeline-text"><strong>Assemble TCF</strong> — 25 test cases, 545 variable blocks (97 active + 448 removed)</div>
             </div>
             <div class="timeline-item">
               <div class="timeline-num">5</div>
-              <div class="timeline-text"><strong>Validate</strong> — strict format + exhaustiveness check</div>
+              <div class="timeline-text"><strong>Validate &amp; Execute</strong> — TBrun record + regress, both exit code 0 ✅</div>
             </div>
           </div>
         </article>
@@ -532,21 +532,22 @@
           <h3 style="color:var(--sun);">TCF Format Sample</h3>
           <div class="code"># Begin Test Case
   File = brakeLiftMonitoring.c
-  Procedure = initBrakeLift
-  Procedure Number = 1
+  Procedure = vCheckBrakeLiftFaultRunning
+  Procedure Number = 5
 
     # Begin Variable
-      Name = config_ptr
-      Decl_type = BrakeLiftConfig_t *
-      Usage = P
-      Value = MAP 1
+      Name = u8Brake1Motor1
+      Decl_type = uint8
+      Usage = G
+      Value = ASSERTED
     # End Variable
 
     # Begin Variable
-      Name = return
-      Decl_type = int
-      Usage = O
-      Value = 0
+      Name = sMscFaultsList[54].u8FaultReturnStatus
+      Decl_type = uint8
+      Usage = H
+      Value = FAULTY_STATE
+      Packed = T
     # End Variable
 # End Test Case</div>
         </article>
@@ -571,31 +572,33 @@
         <article class="panel">
           <h3 style="color:var(--sun);">What It Checks</h3>
           <ul class="list">
-            <li>🔍 <strong>Structure</strong> — proper Begin/End blocks</li>
+            <li>🔍 <strong>Structure</strong> — proper Begin/End blocks, no empty test cases</li>
             <li>📋 <strong>Required fields</strong> — File, Procedure, Procedure Number</li>
-            <li>🏷️ <strong>Variable completeness</strong> — Name, Decl_type, Usage, Value</li>
-            <li>🎯 <strong>Usage codes</strong> — valid I/O/H/P only</li>
-            <li>🧮 <strong>Exhaustiveness</strong> — all functions must have test cases</li>
-            <li>🔗 <strong>Pointer maps</strong> — every P has a matching H</li>
+            <li>🏷️ <strong>Variable universe</strong> — every variable active or removed per test case</li>
+            <li>🎯 <strong>Usage codes</strong> — G (global input), H (expected output), I/O/P</li>
+            <li>🧮 <strong>Exhaustiveness</strong> — all 8 functions, all branches covered</li>
+            <li>🔗 <strong>Struct members</strong> — sMscFaultsList[54..61] with Packed = T</li>
           </ul>
         </article>
         <article class="panel">
           <h3 style="color:var(--good);">Validation Result</h3>
           <div class="code" style="color:#7fff6b;">{
   "valid": true,
-  "test_cases": 8,
-  "total_variables": 119,
+  "test_cases": 25,
+  "active_variables": 97,
+  "removed_variables": 448,
   "functions_covered": [
-    "initBrakeLift",
-    "checkBrakeStatus",
-    "updateLiftState",
-    "processBrakeCmd",
-    "validateConfig",
-    "resetBrakeMonitor",
-    "getBrakeLiftState",
-    "handleBrakeError"
+    "vHandleBrakeMonitoring",
+    "vBrakeLiftFaultAdding",
+    "u8IsBrakeCloseMonitoringIdle",
+    "u8IsBrakeLiftMonitoringRun",
+    "vCheckBrakeLiftFaultRunning",
+    "vCheckBrakeCloseFaultIdle",
+    "vBrakeLiftFaultClearing",
+    "vBrakeCloseFaultClearing"
   ],
-  "errors": []
+  "tbrun_record": "PASS (exit 0)",
+  "tbrun_regress": "PASS (exit 0)"
 }</div>
           <p style="color:var(--good); font-weight:700; margin-top:10px; text-align:center;">✅ ALL CHECKS PASSED</p>
         </article>
@@ -619,20 +622,20 @@
       <div class="panel">
         <div class="stat-row">
           <div class="stat"><b>8</b><span>Functions Tested</span></div>
-          <div class="stat"><b>119</b><span>Variable Blocks</span></div>
-          <div class="stat"><b>100%</b><span>Validation Pass</span></div>
-          <div class="stat"><b>7</b><span>Agent Stages</span></div>
+          <div class="stat"><b>25</b><span>Test Cases</span></div>
+          <div class="stat"><b>545</b><span>Variable Blocks</span></div>
+          <div class="stat"><b>8</b><span>Specialized Agents</span></div>
         </div>
       </div>
       <div class="grid-2" style="margin-top:8px;">
         <article class="panel">
           <h3 style="color:var(--sun);">🏅 Achievements Unlocked</h3>
           <ul class="list">
-            <li>🔥 <strong>Zero manual TCF writing</strong></li>
-            <li>⚡ <strong>Seconds, not hours</strong> to generate tests</li>
-            <li>🛡️ <strong>Validator catches errors before LDRA</strong></li>
-            <li>🎯 <strong>Every function has test coverage</strong></li>
-            <li>🚀 <strong>Mock fallback = demo never fails</strong></li>
+            <li>🔥 <strong>Zero manual TCF writing</strong> — 4,742 lines generated</li>
+            <li>⚡ <strong>Seconds, not hours</strong> to generate 25 test cases</li>
+            <li>🛡️ <strong>TBrun Record + Regress</strong> — both exit code 0</li>
+            <li>🎯 <strong>All 8 functions covered</strong> with branch-level tests</li>
+            <li>🚀 <strong>Complete variable universe</strong> per test case (active + removed)</li>
           </ul>
         </article>
         <article class="panel">
@@ -673,7 +676,7 @@
           </div>
           <div class="timeline-item">
             <div class="timeline-num">3</div>
-            <div class="timeline-text"><strong>Generate exhaustive TCF</strong> — 119 variable blocks in seconds</div>
+            <div class="timeline-text"><strong>Generate exhaustive TCF</strong> — 25 test cases, 545 variable blocks in seconds</div>
           </div>
           <div class="timeline-item">
             <div class="timeline-num">4</div>
@@ -694,7 +697,7 @@
         </div>
       </div>
       <footer class="footer">
-        <span class="pill">🎥 7 Steps, 5 Minutes</span>
+        <span class="pill">🎥 7 Steps, 8 Agents, 10 MCP Tools</span>
         <div class="controls">
           <span class="slide-num">9 / 10</span>
           <button data-prev>◀ Prev</button>
