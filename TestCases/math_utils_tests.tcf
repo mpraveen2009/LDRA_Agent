@@ -1,0 +1,833 @@
+ # Begin Testbed Set
+
+ SINGLE_FILE = TRUE
+ GENERATED_BY = LDRA MCP Agent - Comprehensive Test Coverage
+
+    # Begin Source Files
+    RelativeFile = .\math_utils.c
+    # End Source Files
+
+ # End Testbed Set
+
+    # Begin Attributes
+      Sequence Name = math_utils_Seq
+      Language Code = 2
+    # End Attributes
+
+    # ========================================
+    # Test Case: add - Normal case
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = add
+      Procedure Number = 1
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = a
+          Decl_type = int
+          Usage = I
+          Value = 5
+        # End Variable
+
+        # Begin Variable
+          Name = b
+          Decl_type = int
+          Usage = I
+          Value = 3
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 8
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: add - Boundary case (zero)
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = add
+      Procedure Number = 2
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = a
+          Decl_type = int
+          Usage = I
+          Value = 0
+        # End Variable
+
+        # Begin Variable
+          Name = b
+          Decl_type = int
+          Usage = I
+          Value = 0
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 0
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: add - Boundary case (negative)
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = add
+      Procedure Number = 3
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = a
+          Decl_type = int
+          Usage = I
+          Value = -5
+        # End Variable
+
+        # Begin Variable
+          Name = b
+          Decl_type = int
+          Usage = I
+          Value = 3
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = -2
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: subtract - Normal case
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = subtract
+      Procedure Number = 4
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = a
+          Decl_type = int
+          Usage = I
+          Value = 10
+        # End Variable
+
+        # Begin Variable
+          Name = b
+          Decl_type = int
+          Usage = I
+          Value = 3
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 7
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: subtract - Result is negative
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = subtract
+      Procedure Number = 5
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = a
+          Decl_type = int
+          Usage = I
+          Value = 3
+        # End Variable
+
+        # Begin Variable
+          Name = b
+          Decl_type = int
+          Usage = I
+          Value = 10
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = -7
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: multiply - Normal case
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = multiply
+      Procedure Number = 6
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = a
+          Decl_type = int
+          Usage = I
+          Value = 6
+        # End Variable
+
+        # Begin Variable
+          Name = b
+          Decl_type = int
+          Usage = I
+          Value = 7
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 42
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: multiply - By zero
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = multiply
+      Procedure Number = 7
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = a
+          Decl_type = int
+          Usage = I
+          Value = 100
+        # End Variable
+
+        # Begin Variable
+          Name = b
+          Decl_type = int
+          Usage = I
+          Value = 0
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 0
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: divide - Normal case
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = divide
+      Procedure Number = 8
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = a
+          Decl_type = int
+          Usage = I
+          Value = 20
+        # End Variable
+
+        # Begin Variable
+          Name = b
+          Decl_type = int
+          Usage = I
+          Value = 4
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 5
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: divide - Error case (division by zero)
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = divide
+      Procedure Number = 9
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = a
+          Decl_type = int
+          Usage = I
+          Value = 10
+        # End Variable
+
+        # Begin Variable
+          Name = b
+          Decl_type = int
+          Usage = I
+          Value = 0
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = -1
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: absolute_value - Positive
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = absolute_value
+      Procedure Number = 10
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = x
+          Decl_type = int
+          Usage = I
+          Value = 42
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 42
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: absolute_value - Negative
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = absolute_value
+      Procedure Number = 11
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = x
+          Decl_type = int
+          Usage = I
+          Value = -42
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 42
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: absolute_value - Zero
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = absolute_value
+      Procedure Number = 12
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = x
+          Decl_type = int
+          Usage = I
+          Value = 0
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 0
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: max - a is greater
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = max
+      Procedure Number = 13
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = a
+          Decl_type = int
+          Usage = I
+          Value = 10
+        # End Variable
+
+        # Begin Variable
+          Name = b
+          Decl_type = int
+          Usage = I
+          Value = 5
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 10
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: max - b is greater
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = max
+      Procedure Number = 14
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = a
+          Decl_type = int
+          Usage = I
+          Value = 3
+        # End Variable
+
+        # Begin Variable
+          Name = b
+          Decl_type = int
+          Usage = I
+          Value = 8
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 8
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: max - Equal values
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = max
+      Procedure Number = 15
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = a
+          Decl_type = int
+          Usage = I
+          Value = 7
+        # End Variable
+
+        # Begin Variable
+          Name = b
+          Decl_type = int
+          Usage = I
+          Value = 7
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 7
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: min - a is smaller
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = min
+      Procedure Number = 16
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = a
+          Decl_type = int
+          Usage = I
+          Value = 3
+        # End Variable
+
+        # Begin Variable
+          Name = b
+          Decl_type = int
+          Usage = I
+          Value = 8
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 3
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: clamp - Within range
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = clamp
+      Procedure Number = 17
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = value
+          Decl_type = int
+          Usage = I
+          Value = 50
+        # End Variable
+
+        # Begin Variable
+          Name = min_val
+          Decl_type = int
+          Usage = I
+          Value = 10
+        # End Variable
+
+        # Begin Variable
+          Name = max_val
+          Decl_type = int
+          Usage = I
+          Value = 100
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 50
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: clamp - Below range
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = clamp
+      Procedure Number = 18
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = value
+          Decl_type = int
+          Usage = I
+          Value = 5
+        # End Variable
+
+        # Begin Variable
+          Name = min_val
+          Decl_type = int
+          Usage = I
+          Value = 10
+        # End Variable
+
+        # Begin Variable
+          Name = max_val
+          Decl_type = int
+          Usage = I
+          Value = 100
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 10
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: clamp - Above range
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = clamp
+      Procedure Number = 19
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = value
+          Decl_type = int
+          Usage = I
+          Value = 150
+        # End Variable
+
+        # Begin Variable
+          Name = min_val
+          Decl_type = int
+          Usage = I
+          Value = 10
+        # End Variable
+
+        # Begin Variable
+          Name = max_val
+          Decl_type = int
+          Usage = I
+          Value = 100
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 100
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: clamp - Error case (min > max)
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = clamp
+      Procedure Number = 20
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = value
+          Decl_type = int
+          Usage = I
+          Value = 50
+        # End Variable
+
+        # Begin Variable
+          Name = min_val
+          Decl_type = int
+          Usage = I
+          Value = 100
+        # End Variable
+
+        # Begin Variable
+          Name = max_val
+          Decl_type = int
+          Usage = I
+          Value = 10
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = -1
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: is_even - Even number
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = is_even
+      Procedure Number = 21
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = n
+          Decl_type = int
+          Usage = I
+          Value = 4
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 1
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: is_even - Odd number
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = is_even
+      Procedure Number = 22
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = n
+          Decl_type = int
+          Usage = I
+          Value = 7
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 0
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: is_even - Zero
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = is_even
+      Procedure Number = 23
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = n
+          Decl_type = int
+          Usage = I
+          Value = 0
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 1
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: power - Normal case (2^3)
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = power
+      Procedure Number = 24
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = base
+          Decl_type = int
+          Usage = I
+          Value = 2
+        # End Variable
+
+        # Begin Variable
+          Name = exponent
+          Decl_type = int
+          Usage = I
+          Value = 3
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 8
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: power - Base case (x^0 = 1)
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = power
+      Procedure Number = 25
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = base
+          Decl_type = int
+          Usage = I
+          Value = 10
+        # End Variable
+
+        # Begin Variable
+          Name = exponent
+          Decl_type = int
+          Usage = I
+          Value = 0
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 1
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: power - Error case (negative exponent)
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\math_utils.c
+      Procedure = power
+      Procedure Number = 26
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = base
+          Decl_type = int
+          Usage = I
+          Value = 2
+        # End Variable
+
+        # Begin Variable
+          Name = exponent
+          Decl_type = int
+          Usage = I
+          Value = -2
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = -1
+        # End Variable
+
+    # End Test Case

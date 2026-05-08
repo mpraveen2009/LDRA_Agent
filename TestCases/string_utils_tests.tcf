@@ -1,0 +1,801 @@
+ # Begin Testbed Set
+
+ SINGLE_FILE = TRUE
+ GENERATED_BY = LDRA MCP Agent - Comprehensive Test Coverage
+
+    # Begin Source Files
+    RelativeFile = .\string_utils.c
+    # End Source Files
+
+ # End Testbed Set
+
+    # Begin Attributes
+      Sequence Name = string_utils_Seq
+      Language Code = 2
+    # End Attributes
+
+    # ========================================
+    # Test Case: string_length - Normal string
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = string_length
+      Procedure Number = 1
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = str
+          Decl_type = char *
+          Usage = P
+          Value = addr_str_1
+        # End Variable
+
+        # Begin Variable
+          Name = addr_str_1
+          Decl_type = char *
+          Usage = H
+          Value = "hello"
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 5
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: string_length - Empty string
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = string_length
+      Procedure Number = 2
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = str
+          Decl_type = char *
+          Usage = P
+          Value = addr_str_2
+        # End Variable
+
+        # Begin Variable
+          Name = addr_str_2
+          Decl_type = char *
+          Usage = H
+          Value = ""
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 0
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: string_length - NULL pointer
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = string_length
+      Procedure Number = 3
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = str
+          Decl_type = char *
+          Usage = I
+          Value = NULL
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = -1
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: string_compare - Equal strings
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = string_compare
+      Procedure Number = 4
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = s1
+          Decl_type = char *
+          Usage = P
+          Value = addr_s1_1
+        # End Variable
+
+        # Begin Variable
+          Name = addr_s1_1
+          Decl_type = char *
+          Usage = H
+          Value = "test"
+        # End Variable
+
+        # Begin Variable
+          Name = s2
+          Decl_type = char *
+          Usage = P
+          Value = addr_s2_1
+        # End Variable
+
+        # Begin Variable
+          Name = addr_s2_1
+          Decl_type = char *
+          Usage = H
+          Value = "test"
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 0
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: string_compare - First less than second
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = string_compare
+      Procedure Number = 5
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = s1
+          Decl_type = char *
+          Usage = P
+          Value = addr_s1_2
+        # End Variable
+
+        # Begin Variable
+          Name = addr_s1_2
+          Decl_type = char *
+          Usage = H
+          Value = "abc"
+        # End Variable
+
+        # Begin Variable
+          Name = s2
+          Decl_type = char *
+          Usage = P
+          Value = addr_s2_2
+        # End Variable
+
+        # Begin Variable
+          Name = addr_s2_2
+          Decl_type = char *
+          Usage = H
+          Value = "xyz"
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = -1
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: string_compare - First greater than second
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = string_compare
+      Procedure Number = 6
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = s1
+          Decl_type = char *
+          Usage = P
+          Value = addr_s1_3
+        # End Variable
+
+        # Begin Variable
+          Name = addr_s1_3
+          Decl_type = char *
+          Usage = H
+          Value = "xyz"
+        # End Variable
+
+        # Begin Variable
+          Name = s2
+          Decl_type = char *
+          Usage = P
+          Value = addr_s2_3
+        # End Variable
+
+        # Begin Variable
+          Name = addr_s2_3
+          Decl_type = char *
+          Usage = H
+          Value = "abc"
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 1
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: string_compare - NULL pointer error
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = string_compare
+      Procedure Number = 7
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = s1
+          Decl_type = char *
+          Usage = I
+          Value = NULL
+        # End Variable
+
+        # Begin Variable
+          Name = s2
+          Decl_type = char *
+          Usage = P
+          Value = addr_s2_4
+        # End Variable
+
+        # Begin Variable
+          Name = addr_s2_4
+          Decl_type = char *
+          Usage = H
+          Value = "test"
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = -2
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: char_is_digit - Digit character
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = char_is_digit
+      Procedure Number = 8
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = c
+          Decl_type = char
+          Usage = I
+          Value = '5'
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 1
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: char_is_digit - Non-digit character
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = char_is_digit
+      Procedure Number = 9
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = c
+          Decl_type = char
+          Usage = I
+          Value = 'a'
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 0
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: char_is_digit - Boundary: '0'
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = char_is_digit
+      Procedure Number = 10
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = c
+          Decl_type = char
+          Usage = I
+          Value = '0'
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 1
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: char_is_digit - Boundary: '9'
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = char_is_digit
+      Procedure Number = 11
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = c
+          Decl_type = char
+          Usage = I
+          Value = '9'
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 1
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: char_is_alpha - Lowercase letter
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = char_is_alpha
+      Procedure Number = 12
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = c
+          Decl_type = char
+          Usage = I
+          Value = 'x'
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 1
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: char_is_alpha - Uppercase letter
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = char_is_alpha
+      Procedure Number = 13
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = c
+          Decl_type = char
+          Usage = I
+          Value = 'Z'
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 1
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: char_is_alpha - Digit (not alpha)
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = char_is_alpha
+      Procedure Number = 14
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = c
+          Decl_type = char
+          Usage = I
+          Value = '3'
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 0
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: char_to_upper - Lowercase letter
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = char_to_upper
+      Procedure Number = 15
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = c
+          Decl_type = char
+          Usage = I
+          Value = 'a'
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = char
+          Usage = O
+          Value = 'A'
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: char_to_upper - Already uppercase
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = char_to_upper
+      Procedure Number = 16
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = c
+          Decl_type = char
+          Usage = I
+          Value = 'X'
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = char
+          Usage = O
+          Value = 'X'
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: char_to_upper - Non-letter
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = char_to_upper
+      Procedure Number = 17
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = c
+          Decl_type = char
+          Usage = I
+          Value = '5'
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = char
+          Usage = O
+          Value = '5'
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: char_to_lower - Uppercase letter
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = char_to_lower
+      Procedure Number = 18
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = c
+          Decl_type = char
+          Usage = I
+          Value = 'Z'
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = char
+          Usage = O
+          Value = 'z'
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: char_to_lower - Already lowercase
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = char_to_lower
+      Procedure Number = 19
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = c
+          Decl_type = char
+          Usage = I
+          Value = 'm'
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = char
+          Usage = O
+          Value = 'm'
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: string_index_of - Character found
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = string_index_of
+      Procedure Number = 20
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = str
+          Decl_type = char *
+          Usage = P
+          Value = addr_str_3
+        # End Variable
+
+        # Begin Variable
+          Name = addr_str_3
+          Decl_type = char *
+          Usage = H
+          Value = "hello world"
+        # End Variable
+
+        # Begin Variable
+          Name = ch
+          Decl_type = char
+          Usage = I
+          Value = 'o'
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 4
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: string_index_of - Character not found
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = string_index_of
+      Procedure Number = 21
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = str
+          Decl_type = char *
+          Usage = P
+          Value = addr_str_4
+        # End Variable
+
+        # Begin Variable
+          Name = addr_str_4
+          Decl_type = char *
+          Usage = H
+          Value = "hello"
+        # End Variable
+
+        # Begin Variable
+          Name = ch
+          Decl_type = char
+          Usage = I
+          Value = 'x'
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = -1
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: string_index_of - NULL pointer
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = string_index_of
+      Procedure Number = 22
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = str
+          Decl_type = char *
+          Usage = I
+          Value = NULL
+        # End Variable
+
+        # Begin Variable
+          Name = ch
+          Decl_type = char
+          Usage = I
+          Value = 'a'
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = -1
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: string_last_index_of - Found
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = string_last_index_of
+      Procedure Number = 23
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = str
+          Decl_type = char *
+          Usage = P
+          Value = addr_str_5
+        # End Variable
+
+        # Begin Variable
+          Name = addr_str_5
+          Decl_type = char *
+          Usage = H
+          Value = "abcabc"
+        # End Variable
+
+        # Begin Variable
+          Name = ch
+          Decl_type = char
+          Usage = I
+          Value = 'b'
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = 4
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: string_last_index_of - Not found
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = string_last_index_of
+      Procedure Number = 24
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = str
+          Decl_type = char *
+          Usage = P
+          Value = addr_str_6
+        # End Variable
+
+        # Begin Variable
+          Name = addr_str_6
+          Decl_type = char *
+          Usage = H
+          Value = "xyz"
+        # End Variable
+
+        # Begin Variable
+          Name = ch
+          Decl_type = char
+          Usage = I
+          Value = 'q'
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = -1
+        # End Variable
+
+    # End Test Case
+
+    # ========================================
+    # Test Case: string_last_index_of - NULL pointer
+    # ========================================
+    # Begin Test Case
+      File = c:\Project data\GitHub\LDRA_Agent\LDRA_Agent\samples\string_utils.c
+      Procedure = string_last_index_of
+      Procedure Number = 25
+      Creation Date = May 08 2026 10:00:00
+
+        # Begin Variable
+          Name = str
+          Decl_type = char *
+          Usage = I
+          Value = NULL
+        # End Variable
+
+        # Begin Variable
+          Name = ch
+          Decl_type = char
+          Usage = I
+          Value = 'x'
+        # End Variable
+
+        # Begin Variable
+          Name = result
+          Decl_type = int
+          Usage = O
+          Value = -1
+        # End Variable
+
+    # End Test Case
