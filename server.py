@@ -9,6 +9,7 @@ import re
 import json
 import uuid
 import time
+import sys
 import subprocess
 import argparse
 import xml.etree.ElementTree as ET
@@ -27,6 +28,18 @@ CONTBRUN = LDRA_INSTALL / "Contbrun.exe"
 CONTESTBED = LDRA_INSTALL / "Contestbed.exe"
 TBINI = LDRA_INSTALL / "TBini.exe"
 MOCK_DB = Path(__file__).with_name(".mock_trigger_jobs.json")
+JOB_RESULTS_DIR = Path(__file__).with_name(".trigger_job_results")
+ACTIVE_JOB_PROCS: dict[str, subprocess.Popen] = {}
+
+DEFAULT_DEMO_PROJECT_TCF = Path(
+    r"C:\Users\k64126431\OneDrive - KONE Corporation\Work_dir\IEX_Repos\iex_msc\LDRA\Unit Testing\Application\application.tcf"
+)
+DEFAULT_DEMO_TEST_DIR = Path(
+    r"C:\Users\k64126431\OneDrive - KONE Corporation\Work_dir\IEX_Repos\iex_msc\LDRA\CopilotGenerated\TestCases"
+)
+DEFAULT_DEMO_SINGLE_TCF = DEFAULT_DEMO_TEST_DIR / "brakeLiftMonitoring_all_functions_custom.tcf"
+DEFAULT_DEMO_PROJECT_NAME = "application"
+TRIGGER_EXECUTOR_CONFIG: dict | None = None
 
 if FastMCP is not None:
     mcp = FastMCP("ldra-tbrun")
@@ -98,7 +111,76 @@ def _save_mock_jobs(jobs: dict[str, dict]) -> None:
     MOCK_DB.write_text(json.dumps(jobs, indent=2), encoding="utf-8")
 
 
-def _create_mock_job(source_repo: str, commit_sha: str, branch: str) -> dict:
+def _load_json(path: Path) -> dict:
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {}
+
+
+def _can_use_real_executor(config: dict | None) -> bool:
+    if not config:
+        return False
+    required = [
+        Path(config["project_tcf"]),
+        Path(config["test_dir"]),
+    ]
+    single_tcf = config.get("single_tcf")
+    if single_tcf:
+        required.append(Path(single_tcf))
+    return all(path.exists() for path in required)
+
+
+def _start_real_executor_job(job: dict, config: dict) -> None:
+    JOB_RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    repo_root = Path(__file__).resolve().parent
+    results_path = JOB_RESULTS_DIR / f"{job['job_id']}.json"
+    log_path = JOB_RESULTS_DIR / f"{job['job_id']}.log"
+    command = [
+        sys.executable,
+        str(repo_root / "src" / "test_executor.py"),
+        "--project-tcf",
+        str(config["project_tcf"]),
+        "--test-dir",
+        str(config["test_dir"]),
+        "--project-name",
+        str(config["project_name"]),
+        "--output",
+        str(results_path),
+    ]
+    if config.get("record_first"):
+        command.append("--record-first")
+    if config.get("unit_only"):
+        command.append("--unit-only")
+    if config.get("single_tcf"):
+        command.extend(["--single-tcf", str(config["single_tcf"])])
+
+    log_handle = log_path.open("w", encoding="utf-8")
+    proc = subprocess.Popen(
+        command,
+        cwd=str(repo_root),
+        stdout=log_handle,
+        stderr=subprocess.STDOUT,
+        text=True,
+    )
+    ACTIVE_JOB_PROCS[job["job_id"]] = proc
+    job["mode"] = "mock-trigger-real-ldra"
+    job["status"] = "running"
+    job["results_path"] = str(results_path)
+    job["log_path"] = str(log_path)
+    job["executor"] = {
+        "project_tcf": str(config["project_tcf"]),
+        "test_dir": str(config["test_dir"]),
+        "project_name": str(config["project_name"]),
+        "single_tcf": str(config["single_tcf"]) if config.get("single_tcf") else None,
+        "unit_only": bool(config.get("unit_only")),
+        "record_first": bool(config.get("record_first")),
+    }
+
+
+def _create_mock_job(source_repo: str, commit_sha: str, branch: str, exec_config: dict | None = None) -> dict:
     jobs = _load_mock_jobs()
     job_id = str(uuid.uuid4())
     job = {
@@ -114,6 +196,10 @@ def _create_mock_job(source_repo: str, commit_sha: str, branch: str) -> dict:
         "updated_at": _utc_now_iso(),
         "summary": None,
     }
+
+    if _can_use_real_executor(exec_config):
+        _start_real_executor_job(job, exec_config)
+
     jobs[job_id] = job
     _save_mock_jobs(jobs)
     return job
@@ -128,6 +214,50 @@ def _refresh_mock_job(job_id: str) -> dict | None:
     job = jobs.get(job_id)
     if not job:
         return None
+
+    if job.get("mode") == "mock-trigger-real-ldra":
+        results_path = Path(job.get("results_path", ""))
+        if results_path.exists():
+            payload = _load_json(results_path)
+            summary = payload.get("summary") or {}
+            coverage = payload.get("coverage") or {}
+            job["status"] = "completed"
+            job["summary"] = summary
+            job["coverage"] = coverage
+            job["updated_at"] = _utc_now_iso()
+            jobs[job_id] = job
+            _save_mock_jobs(jobs)
+            return job
+
+        proc = ACTIVE_JOB_PROCS.get(job_id)
+        if proc is not None:
+            exit_code = proc.poll()
+            if exit_code is None:
+                job["status"] = "running"
+            else:
+                job["status"] = "failed"
+                job["summary"] = {
+                    "total_tests": 0,
+                    "passed": 0,
+                    "failed": 1,
+                    "note": f"Executor exited before producing results (exit {exit_code})",
+                }
+                log_path = Path(job.get("log_path", ""))
+                if log_path.exists():
+                    try:
+                        job["stderr_excerpt"] = "\n".join(log_path.read_text(encoding="utf-8", errors="replace").splitlines()[-20:])
+                    except OSError:
+                        pass
+            job["updated_at"] = _utc_now_iso()
+            jobs[job_id] = job
+            _save_mock_jobs(jobs)
+            return job
+
+        job["status"] = "running"
+        job["updated_at"] = _utc_now_iso()
+        jobs[job_id] = job
+        _save_mock_jobs(jobs)
+        return job
 
     if job.get("status") == "completed":
         return job
@@ -177,8 +307,24 @@ def _make_mock_handler():
             commit_sha = str(data.get("commit_sha", "unknown"))
             branch = str(data.get("branch", "unknown"))
 
-            job = _create_mock_job(source_repo, commit_sha, branch)
-            self._send_json(202, {"accepted": True, "job_id": job["job_id"], "status": "queued"})
+            exec_config = dict(TRIGGER_EXECUTOR_CONFIG or {})
+            for key in ("project_tcf", "test_dir", "project_name", "single_tcf"):
+                if data.get(key):
+                    exec_config[key] = data[key]
+            for key in ("unit_only", "record_first"):
+                if key in data:
+                    exec_config[key] = bool(data[key])
+
+            job = _create_mock_job(source_repo, commit_sha, branch, exec_config=exec_config)
+            self._send_json(
+                202,
+                {
+                    "accepted": True,
+                    "job_id": job["job_id"],
+                    "status": job["status"],
+                    "mode": job["mode"],
+                },
+            )
 
         def do_GET(self):
             if not self.path.startswith("/status/"):
@@ -506,7 +652,22 @@ if __name__ == "__main__":
     parser.add_argument("--run-mock-trigger-api", action="store_true", help="Run demo HTTP trigger API")
     parser.add_argument("--host", default="127.0.0.1", help="Host for mock trigger API")
     parser.add_argument("--port", type=int, default=8000, help="Port for mock trigger API")
+    parser.add_argument("--project-tcf", default=str(DEFAULT_DEMO_PROJECT_TCF), help="Project .tcf for real executor path")
+    parser.add_argument("--test-dir", default=str(DEFAULT_DEMO_TEST_DIR), help="Directory containing test .tcf files")
+    parser.add_argument("--project-name", default=DEFAULT_DEMO_PROJECT_NAME, help="LDRA project name")
+    parser.add_argument("--single-tcf", default=str(DEFAULT_DEMO_SINGLE_TCF), help="Single TCF for smoke demo")
+    parser.add_argument("--unit-only", action="store_true", help="Skip static analysis in trigger-launched runs")
+    parser.add_argument("--record-first", action="store_true", help="Run record mode before regress mode")
     args = parser.parse_args()
+
+    TRIGGER_EXECUTOR_CONFIG = {
+        "project_tcf": args.project_tcf,
+        "test_dir": args.test_dir,
+        "project_name": args.project_name,
+        "single_tcf": args.single_tcf,
+        "unit_only": args.unit_only,
+        "record_first": args.record_first,
+    }
 
     if args.run_mock_trigger_api:
         run_mock_trigger_api(host=args.host, port=args.port)

@@ -7,23 +7,53 @@ You have access to the `ldra-tbrun` MCP tools to read source files, create `.tcf
 
 When asked to write unit tests for a C file, follow these steps:
 
-### Step 1 – Understand the source code
-1. Call `read_c_file` to read the C source file.
+### Step 1 – Deep source code analysis
+1. Call `read_c_file` to read the ENTIRE C source file.
 2. Call `list_procedures` to get the list of all testable functions.
-3. Analyse each function: identify inputs, outputs, boundary conditions, and error paths.
+3. For EACH function, perform deep analysis:
+   - **Read every line** of the function body.
+   - **List ALL variables** the function accesses: static file-scope variables, extern globals, struct members (e.g., `sMscFaultsList[54].u8FaultReturnStatus`), function parameters, return values.
+   - **Map every branch**: every `if/else`, `switch/case`, `for/while` — trace which variables control each branch.
+   - **Build the variable universe**: the complete set of ALL variables across ALL functions in the file.
 
-### Step 2 – Generate test cases
-For each function, use `get_tcf_template` to get a base template, then fill it in with:
-- **Normal cases**: typical valid inputs with expected outputs.
-- **Boundary cases**: minimum/maximum values, empty strings, zero, NULL.
-- **Error cases**: invalid inputs that should trigger error handling.
+### Step 2 – Generate exhaustive test cases with COMPLETE variable coverage
+For each function, generate **one test case per execution path** (not just one per function):
 
-The `.tcf` format uses these Variable Usage codes:
+#### Variable blocks in each test case
+Every test case MUST contain variable blocks for the ENTIRE variable universe of that function:
+
+1. **Active variables** (`# Begin Variable` / `# End Variable`) — variables that drive this test case:
+   - `Usage = G` + `Value = <concrete>` — global/static inputs set BEFORE the function runs
+   - `Usage = H` + `Value = <concrete>` — expected outputs checked AFTER the function runs
+   - `Usage = I` + `Value = <concrete>` — function parameter inputs
+   - `Usage = O` + `Value = <concrete>` — expected return value
+
+2. **Removed variables** (`# Begin Removed Variable` / `# End Removed Variable`) — variables NOT active in this test case but still part of the universe:
+   - Include `Name`, `Decl_type`, `Usage` — but NO `Value`
+   - Both `G` and `H` variants must appear for each unused variable
+
+3. **Struct member variables** — use exact qualified names with array indices:
+   ```
+   Name = sMscFaultsList[54].u8FaultReturnStatus
+   Decl_type = uint8
+   Usage = H
+   Value = FAULTY_STATE
+   Packed = T
+   ```
+
+#### Test case count per function
+- Minimum: **one test case per decision branch**
+- For `if (A && B && C)`: separate test cases where each sub-condition is independently FALSE
+- For `switch`: one test case per `case` + one for `default`
+- For fault counters: test at threshold boundaries (below, at, above)
+
+### The `.tcf` format uses these Variable Usage codes:
 | Code | Meaning |
 |------|---------|
-| `I`  | Input — value passed into the function |
-| `O`  | Output — expected return or output parameter value |
-| `H`  | Helper — auto-generated map variable (for pointer inputs) |
+| `G`  | Global/static input — set before function call |
+| `H`  | Helper/expected output — checked after function call |
+| `I`  | Input — value passed into the function as parameter |
+| `O`  | Output — expected return value |
 | `P`  | Pointer input (use with a matching `H` helper variable) |
 
 ### Step 3 – Save and run tests
@@ -47,12 +77,13 @@ The `.tcf` format uses these Variable Usage codes:
 
     # Begin Source Files
     RelativeFile = .\myfile.c
+    File = C:\path\to\myfile.c
     # End Source Files
 
  # End Testbed Set
 
     # Begin Attributes
-      Sequence Name = MyFunction_Seq
+      Sequence Name = myfile_Seq
       Language Code = 2
     # End Attributes
 
@@ -63,25 +94,51 @@ The `.tcf` format uses these Variable Usage codes:
       Creation Date = Jan 01 2026 12:00:00
 
         # Begin Variable
-          Name = input_param
-          Decl_type = int
-          Usage = I
-          Value = 42
+          Name = u8InputFlag
+          Decl_type = uint8
+          Usage = G
+          Value = ACTIVE
         # End Variable
 
         # Begin Variable
-          Name = expected_return
-          Decl_type = int
-          Usage = O
-          Value = 84
+          Name = u8InputFlag
+          Decl_type = uint8
+          Usage = H
+          Value = INACTIVE
         # End Variable
+
+        # Begin Variable
+          Name = sMscFaultsList[54].u8FaultReturnStatus
+          Decl_type = uint8
+          Usage = H
+          Value = FAULTY_STATE
+          Packed = T
+        # End Variable
+
+        # Begin Removed Variable
+          Name = u8UnusedGlobal
+          Decl_type = uint8
+          Usage = G
+        # End Removed Variable
+
+        # Begin Removed Variable
+          Name = u8UnusedGlobal
+          Decl_type = uint8
+          Usage = H
+        # End Removed Variable
 
     # End Test Case
 ```
 
+## CRITICAL Quality Rules
+- **NEVER generate empty test cases** — every test case MUST have variable blocks (active + removed). A test case with just `Procedure` and no variables is WORTHLESS.
+- **EVERY variable from the function's universe MUST appear** in every test case — either as active (with Value) or removed (without Value).
+- **A variable can appear TWICE** in one test case: once as `Usage = G` (input) and once as `Usage = H` (expected output).
+- **Use LDRA-compatible values**: `0u`, `1u`, `ACTIVE`, `INACTIVE`, `ASSERTED`, `DEASSERTED`, enum constants, etc.
+
 ## Rules
 - Always check `exit_code` after running TBrun and explain what it means.
-- One `.tcf` file per function (or per logical test group).
+- One `.tcf` file per source file (covering all functions) or per logical test group.
 - Store generated test TCFs alongside the source file or in a `TestCases/` subfolder.
 - Never guess file paths — use `list_tcf_files` or ask the user to confirm.
 - Target at least **Statement (SC)** and **Branch (DC)** coverage. For safety-critical code aim for **MC/DC**.

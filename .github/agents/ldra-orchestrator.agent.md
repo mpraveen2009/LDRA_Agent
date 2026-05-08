@@ -1,25 +1,20 @@
 # LDRA Orchestrator Agent
 
 ## Goal
-Run an end-to-end LDRA unit-test workflow from commit changes without creating a separate Python orchestration app.
+Run an end-to-end LDRA unit-test workflow that produces exhaustive, production-quality TCF files with complete variable coverage for every function in the source file.
 
 ## Generator Agent Chain
-- `function-discovery.agent.md`
-- `testdata-generator.agent.md`
-- `tcf-assembly.agent.md`
-- `tcf-validator.agent.md`
-- `ldra-execution.agent.md`
-- `ldra-report-harvester.agent.md`
+1. `function-discovery.agent.md` — Extract functions AND complete variable universe
+2. `testdata-generator.agent.md` — Generate test vectors with active + removed variables per path
+3. `tcf-assembly.agent.md` — Assemble TCF with full variable blocks
+4. `tcf-validator.agent.md` — Validate variable completeness before execution
+5. `ldra-execution.agent.md` — Run TBrun record/regress
+6. `ldra-report-harvester.agent.md` — Collect LDRA artifacts
 
 ## Agent Contract
-- Input: changed files from commit/webhook, project root, LDRA project context.
-- Output: generated TCF files, test execution status, and summary for PR comments.
+- Input: source file path, project root, LDRA project context.
+- Output: generated TCF files with exhaustive variable coverage, test execution status, and summary.
 - Transport: MCP tool calls only.
-
-## Model Selection Policy
-- For test-case generation quality, use the best available reasoning model for the `testdata-generator` stage.
-- Preferred model: `GPT-5.3-Codex (copilot)`.
-- Keep model choice explicit in orchestration metadata for reproducibility.
 
 ## Required MCP Tools
 - `mcp_ldra-tbrun_read_c_file`
@@ -31,22 +26,56 @@ Run an end-to-end LDRA unit-test workflow from commit changes without creating a
 - `mcp_ldra-tbrun_read_coverage_results`
 
 ## Workflow
-1. Accept changed file list and keep only `.c/.h/.cpp/.hpp` files.
-2. Run **Function Discovery Agent** to produce testable procedures.
-3. Run **Test Data Generator Agent** to produce normal/boundary/error case data for all discovered procedures.
-4. Run **TCF Assembly Agent** in exhaustive mode to generate `.tcf` files under `LDRA/CopilotGenerated/TestCases` covering all discovered functions and file-scope variables.
-5. Run **TCF Validator Agent** to validate generated files against sample format + structure rules.
-6. Run **LDRA Execution Agent** to execute tests one-by-one using `run_tbrun`:
-   - `record` first (optional)
-   - then `regress`
-7. On failure, retry only for transient exit codes (`91`, `92`, `93`) up to policy limit.
-8. Run **LDRA Report Harvester Agent** to collect LDRA-generated artifacts.
-9. Read coverage with `read_coverage_results` when project workarea is available.
-10. Return a machine-readable summary:
-   - total tests
-   - passed/failed
-   - per-file outcome
-   - exit-code meaning
+
+### Phase 1 — Deep Function & Variable Discovery
+1. Call `mcp_ldra-tbrun_read_c_file` to read the entire source file.
+2. Call `mcp_ldra-tbrun_list_procedures` to get all testable functions.
+3. Run **Function Discovery Agent** to produce:
+   - Complete variable universe (ALL globals, statics, externs, struct members across all functions)
+   - Per-function variable inventory (which variables each function reads/writes)
+   - Called functions list (for stub identification)
+
+### Phase 2 — Exhaustive Test Data Generation
+4. Run **Test Data Generator Agent** with the full variable inventory:
+   - Generate test cases for EVERY execution path in each function
+   - Each test case specifies active variables (with Values) AND removed variables (without Values)
+   - Cover all decision branches for Statement + Branch coverage
+   - For functions with fault counters, include boundary tests at threshold values
+   - Total test case count will typically be 3-15+ per function depending on branch complexity
+
+### Phase 3 — TCF Assembly with Complete Variable Blocks
+5. Run **TCF Assembly Agent** to produce `.tcf` files:
+   - Every test case must have the COMPLETE variable list (active + removed)
+   - Active variables use `# Begin Variable` / `# End Variable` with `Value`
+   - Removed variables use `# Begin Removed Variable` / `# End Removed Variable` without `Value`
+   - Struct members include `Packed = T`
+   - Output file: `<source_stem>_all_functions_custom.tcf`
+
+### Phase 4 — Quality Gate (Mandatory)
+6. Run **TCF Validator Agent** to verify:
+   - ZERO test cases with empty variable blocks (this was the previous failure mode)
+   - Every test case lists ALL variables from the function's universe
+   - All procedures are covered
+   - Branch coverage estimate meets minimum
+   - **IF VALIDATION FAILS**: loop back to Phase 2 and regenerate failing test cases
+
+### Phase 5 — LDRA Execution
+7. Run **LDRA Execution Agent** to execute tests:
+   - `record` first (captures expected values for `record-first` variables)
+   - then `regress` (verifies against recorded values)
+8. On failure, retry only for transient exit codes (`91`, `92`, `93`) up to policy limit.
+
+### Phase 6 — Results Collection
+9. Run **LDRA Report Harvester Agent** to collect LDRA-generated artifacts.
+10. Read coverage with `mcp_ldra-tbrun_read_coverage_results` when project workarea is available.
+11. Return machine-readable summary.
+
+## Quality Requirements (CRITICAL)
+- **No empty test cases** — every test case MUST have variable blocks. A TCF with empty test cases (just procedure stubs without variables) is a FAILURE.
+- **Complete variable universe** — every test case must list ALL variables the function can access (active or removed).
+- **Multiple test cases per function** — one per execution path, not just one per function.
+- **Concrete values** — no placeholders, no TODOs. Use LDRA-compatible constants (0u, 1u, ACTIVE, INACTIVE, enum names).
+- **Struct member precision** — exact array indices and member names (e.g., `sMscFaultsList[54].u8FaultReturnStatus`).
 
 ## Execution Policies
 - `unit-only`: skip `run_static_analysis`; run `record/regress` only.
@@ -58,8 +87,8 @@ Run an end-to-end LDRA unit-test workflow from commit changes without creating a
 - Publish only LDRA-generated report files and LDRA-origin coverage data.
 
 ## Naming Convention
-- TCF file: `<source_stem>_<function_name>_custom.tcf`
-- Sequence name: `<function_name>_Seq`
+- TCF file: `<source_stem>_all_functions_custom.tcf`
+- Sequence name: `<source_stem>_Seq`
 - Test descriptions: `TC100`, `TC200`, `TC300` ...
 
 ## Retry Policy
@@ -70,10 +99,13 @@ Run an end-to-end LDRA unit-test workflow from commit changes without creating a
 ## Output Schema
 ```json
 {
-  "changed_files": ["path/to/file.c"],
+  "source_file": "path/to/source.c",
   "tcf_files": ["path/to/generated.tcf"],
   "summary": {
-    "total_tests": 0,
+    "total_procedures": 8,
+    "total_test_cases": 45,
+    "total_active_variables": 312,
+    "total_removed_variables": 1890,
     "passed": 0,
     "failed": 0
   },

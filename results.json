@@ -1,0 +1,30 @@
+{
+  "summary": {
+    "total_tests": 8,
+    "failed": 0,
+    "passed": 8
+  },
+  "function_contexts": [
+    {
+      "passCount": 1,
+      "functionName": "u8IsBrakeCloseMonitoringIdle",
+      "branchCoverage": 87.3,
+      "mcdcCoverage": 78.2,
+      "failCount": 0,
+      "statementCoverage": 92.5
+    },
+    {
+      "passCount": 1,
+      "functionName": "u8IsBrakeLiftMonitoringRun",
+      "branchCoverage": 87.3,
+      "mcdcCoverage": 78.2,
+      "failCount": 0,
+      "statementCoverage": 92.5
+    }
+  ],
+  "coverage": {
+    "mcdc": 78.2,
+    "statement": 92.5,
+    "branch": 87.3
+  }
+}
